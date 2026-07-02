@@ -16,7 +16,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     // Initial fetch from localStorage for offline persistence
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('village_directory_lang');
-      if (saved && (saved === 'en' || saved === 'hi' || saved === 'te' || saved === 'ml')) {
+      if (saved && (saved === 'en' || saved === 'hi' || saved === 'te' || saved === 'ml' || saved === 'kn')) {
         return saved as Language;
       }
     }

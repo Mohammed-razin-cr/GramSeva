@@ -1,4 +1,4 @@
-export type Language = 'en' | 'hi' | 'te' | 'ml';
+export type Language = 'en' | 'hi' | 'te' | 'ml' | 'kn';
 
 export interface LanguageConfig {
   code: Language;
@@ -26,7 +26,7 @@ export interface ServiceItem {
   phoneNumber: string;
   lastVerified: string;
   isEmergency: boolean;
-  translations: Record<Language, ServiceTranslation>;
+  translations: Record<'en', ServiceTranslation> & Partial<Record<Language, ServiceTranslation>>;
   districtName?: string;
   localityName?: string;
 }

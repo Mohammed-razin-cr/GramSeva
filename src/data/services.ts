@@ -4,7 +4,8 @@ export const SUPPORTED_LANGUAGES: LanguageConfig[] = [
   { code: 'ml', name: 'Malayalam', nativeName: 'മലയാളം', flag: '🌴' },
   { code: 'en', name: 'English', nativeName: 'English', flag: '🇮🇳' },
   { code: 'hi', name: 'Hindi', nativeName: 'हिन्दी', flag: '🇮🇳' },
-  { code: 'te', name: 'Telugu', nativeName: 'తెలుగు', flag: '🇮🇳' }
+  { code: 'te', name: 'Telugu', nativeName: 'తెలుగు', flag: '🇮🇳' },
+  { code: 'kn', name: 'Kannada', nativeName: 'ಕನ್ನಡ', flag: '🇮🇳' }
 ];
 
 export const UI_TRANSLATIONS: Record<Language, UIStrings> = {
@@ -77,6 +78,41 @@ export const UI_TRANSLATIONS: Record<Language, UIStrings> = {
     callVolunteerLabel: "Call Representative",
     offlineProofLabel: "Available entirely offline",
     verificationHistoryLabel: "Verification History"
+  },
+  kn: {
+    title: "ಕೇರಳ ಅಗತ್ಯ ಸೇವೆಗಳ ಡೈರೆಕ್ಟರಿ",
+    subtitle: "ಆಫ್‌ಲೈನ್ ಮೊದಲು ಸ್ಥಳೀಯ ಭಾಷಾ ಡೈರೆಕ್ಟರಿ",
+    searchPlaceholder: "ಸೇವೆಗಳು, ಸಂಪರ್ಕ ಹೆಸರುಗಳು, ಜಿಲ್ಲೆಗಳು ಅಥವಾ ಸ್ಥಳಗಳನ್ನು ಹುಡುಕಿ...",
+    allCategories: "ಎಲ್ಲಾ ವಿಭಾಗಗಳು",
+    health: "ಕುಟುಂಬ ಆರೋಗ್ಯ ಕೇಂದ್ರ",
+    water: "ಕುಡಿಯುವ ನೀರಿನ ಯೋಜನೆ",
+    agriculture: "ಕೃಷಿ ಭವನ",
+    education: "ಶಾಲೆಗಳು ಮತ್ತು ಶಿಕ್ಷಣ",
+    government: "ಗ್ರಾಮ ಪಂಚಾಯತ್ ಕಚೇರಿ",
+    emergencyOnly: "ತುರ್ತು ಮಾತ್ರ",
+    lastVerifiedLabel: "ಪರಿಶೀಲಿಸಲಾಗಿದೆ",
+    contactLabel: "ಸಂಪರ್ಕ ಪ್ರತಿನಿಧಿ",
+    hoursLabel: "ಕಾರ್ಯ ಸಮಯ",
+    locationLabel: "ಸ್ಥಳದ ವಿವರ",
+    offlineStatus: "ಆಫ್‌ಲೈನ್ ಮೋಡ್ ಸಕ್ರಿಯ",
+    offlineStatusDesc: "ಎಲ್ಲಾ ಡೈರೆಕ್ಟರಿ ಮಾಹಿತಿ ನಿಮ್ಮ ಬ್ರೌಸರ್‌ನಲ್ಲಿ ಉಳಿಸಲಾಗಿದೆ. ಇಂಟರ್ನೆಟ್ ಇಲ್ಲದಿದ್ದರೂ ಕೆಲಸ ಮಾಡುತ್ತದೆ.",
+    noServicesFound: "ನಿಮ್ಮ ಹುಡುಕಾಟಕ್ಕೆ ಹೊಂದುವ ಸೇವೆಗಳು ಕಂಡುಬಂದಿಲ್ಲ. ಫಿಲ್ಟರ್ ಬದಲಿಸಿ ನೋಡಿ.",
+    volunteerBadge: "ಪರಿಶೀಲಿಸಿದ ಸ್ವಯಂಸೇವಕ ಸೇವೆ",
+    volunteerMessage: "ಈ ಪಟ್ಟಿಯಲ್ಲಿ ಕೇರಳದ ಸ್ಥಳೀಯ ಸ್ವಯಂಸೇವಕರು ಮತ್ತು ಸಾರ್ವಜನಿಕ ಸೇವಕರ ಸಂಪರ್ಕಗಳಿವೆ.",
+    addServiceBtn: "+ ಹೊಸ ಸೇವೆ ಸೂಚಿಸಿ",
+    addServiceTitle: "ಸಮುದಾಯ ಸೇವೆ ಸೂಚಿಸಿ",
+    closeBtn: "ಮುಚ್ಚಿ",
+    submitBtn: "ಸ್ಥಳೀಯ ಡೈರೆಕ್ಟರಿಗೆ ಸೇರಿಸಿ",
+    detailsTitle: "ಸೇವೆಯ ವಿವರಗಳು",
+    historyLabel: "ಪರಿಶೀಲನಾ ದಾಖಲೆಗಳು",
+    extraNotesLabel: "ಸಮುದಾಯ ಮಾರ್ಗಸೂಚಿಗಳು",
+    metadataLabel: "ಸ್ಥಳೀಯ ನೋಂದಣಿ ಮಾಹಿತಿ",
+    shareLabel: "ಮಾಹಿತಿ ಹಂಚಿ",
+    reportUpdateLabel: "ತಿದ್ದುಪಡಿ ಸೂಚಿಸಿ",
+    serviceIdLabel: "ಸೇವಾ ನೋಂದಣಿ ಐಡಿ",
+    callVolunteerLabel: "ಪ್ರತಿನಿಧಿಗೆ ಕರೆ ಮಾಡಿ",
+    offlineProofLabel: "ಸಂಪೂರ್ಣವಾಗಿ ಆಫ್‌ಲೈನ್‌ನಲ್ಲಿ ಲಭ್ಯ",
+    verificationHistoryLabel: "ಪರಿಶೀಲನಾ ಇತಿಹಾಸ"
   },
   hi: {
     title: "केरल आवश्यक सेवा निर्देशिका",
@@ -991,11 +1027,13 @@ const CATEGORY_KEYS: Array<'health' | 'water' | 'agriculture' | 'education' | 'g
   'health', 'water', 'agriculture', 'education', 'government'
 ];
 
+type GeneratedLanguage = Exclude<Language, 'kn'>;
+
 interface GeneratedData {
-  title: Record<Language, string>;
-  description: Record<Language, string>;
-  category: Record<Language, string>;
-  hours: Record<Language, string>;
+  title: Record<GeneratedLanguage, string>;
+  description: Record<GeneratedLanguage, string>;
+  category: Record<GeneratedLanguage, string>;
+  hours: Record<GeneratedLanguage, string>;
 }
 
 // Simple generator logic to generate the remaining 995 services to hit EXACTLY 1000 items!

@@ -30,7 +30,34 @@ import {
   Shield,
   Store,
   Baby,
-  FileText
+  FileText,
+  Hospital,
+  School,
+  Landmark,
+  Waves,
+  Wheat,
+  ClipboardList,
+  Stethoscope,
+  Ambulance,
+  FlaskConical,
+  BookOpen,
+  FileCheck2,
+  Banknote,
+  Home,
+  Trees,
+  BusFront,
+  Scale,
+  HandCoins,
+  AlertTriangle,
+  Copy,
+  Share2,
+  MessageCircle,
+  Flag,
+  ListChecks,
+  Eye,
+  Type,
+  Siren,
+  Filter
 } from 'lucide-react';
 import { LanguageProvider, useLanguage } from './context/LanguageContext';
 import { 
@@ -95,18 +122,172 @@ function DirectoryApp() {
   };
 
   const ls = locStrings[language as keyof typeof locStrings] || locStrings.en;
-  
-  // Tab controller state: 'services' | 'map' | 'suggest' | 'profile'
-  const [currentTab, setCurrentTab] = useState<'services' | 'map' | 'suggest' | 'profile'>('services');
 
-  // Offline simulation state
+  const ui = {
+    en: {
+      emergency: "Emergency",
+      services: "Services",
+      map: "Map",
+      suggest: "Suggest",
+      profile: "Profile",
+      reportWrongInfo: "Report wrong info",
+      reportTitle: "Report incorrect service details",
+      reportHint: "Tell local volunteers what needs correction.",
+      reportPlaceholder: "Phone number is wrong, timing changed, location closed...",
+      submitReport: "Submit report",
+      documentChecklist: "Document checklist",
+      actions: "Quick actions",
+      copyPhone: "Copy phone",
+      copyDetails: "Copy details",
+      whatsapp: "WhatsApp",
+      share: "Share",
+      searchSuggestions: "Suggestions",
+      emergencyIntro: "Fast access to urgent health, safety, and public support contacts.",
+      noEmergency: "No emergency services found for these filters.",
+      accessibility: "Accessibility",
+      largeText: "Large text",
+      highContrast: "High contrast",
+      mapFilter: "Map filter"
+    },
+    ml: {
+      emergency: "അടിയന്തിരം",
+      services: "സേവനങ്ങൾ",
+      map: "മാപ്പ്",
+      suggest: "നിർദ്ദേശം",
+      profile: "പ്രൊഫൈൽ",
+      reportWrongInfo: "തെറ്റായ വിവരം റിപ്പോർട്ട് ചെയ്യുക",
+      reportTitle: "സേവന വിവര തിരുത്തൽ റിപ്പോർട്ട്",
+      reportHint: "തിരുത്തേണ്ട കാര്യം സന്നദ്ധപ്രവർത്തകരെ അറിയിക്കുക.",
+      reportPlaceholder: "ഫോൺ നമ്പർ തെറ്റാണ്, സമയം മാറി, സ്ഥലം അടഞ്ഞു...",
+      submitReport: "റിപ്പോർട്ട് സമർപ്പിക്കുക",
+      documentChecklist: "രേഖാ പട്ടിക",
+      actions: "വേഗത്തിലുള്ള പ്രവർത്തനങ്ങൾ",
+      copyPhone: "ഫോൺ പകർത്തുക",
+      copyDetails: "വിവരം പകർത്തുക",
+      whatsapp: "വാട്ട്സ്ആപ്പ്",
+      share: "പങ്കിടുക",
+      searchSuggestions: "നിർദ്ദേശങ്ങൾ",
+      emergencyIntro: "ആരോഗ്യം, സുരക്ഷ, പൊതു സഹായം എന്നിവയ്ക്കുള്ള അടിയന്തിര ബന്ധങ്ങൾ.",
+      noEmergency: "ഈ ഫിൽട്ടറിൽ അടിയന്തിര സേവനങ്ങളില്ല.",
+      accessibility: "അക്സസിബിലിറ്റി",
+      largeText: "വലിയ ടെക്സ്റ്റ്",
+      highContrast: "ഹൈ കോൺട്രാസ്റ്റ്",
+      mapFilter: "മാപ്പ് ഫിൽട്ടർ"
+    },
+    hi: {
+      emergency: "आपातकाल",
+      services: "सेवाएं",
+      map: "मैप",
+      suggest: "सुझाव",
+      profile: "प्रोफाइल",
+      reportWrongInfo: "गलत जानकारी रिपोर्ट करें",
+      reportTitle: "सेवा विवरण सुधार रिपोर्ट",
+      reportHint: "स्थानीय स्वयंसेवकों को बताएं क्या सुधारना है।",
+      reportPlaceholder: "फोन नंबर गलत है, समय बदला है, स्थान बंद है...",
+      submitReport: "रिपोर्ट भेजें",
+      documentChecklist: "दस्तावेज सूची",
+      actions: "त्वरित क्रियाएं",
+      copyPhone: "फोन कॉपी करें",
+      copyDetails: "विवरण कॉपी करें",
+      whatsapp: "WhatsApp",
+      share: "शेयर करें",
+      searchSuggestions: "सुझाव",
+      emergencyIntro: "स्वास्थ्य, सुरक्षा और सार्वजनिक सहायता के लिए तेज संपर्क।",
+      noEmergency: "इन फिल्टरों में आपातकालीन सेवाएं नहीं मिलीं।",
+      accessibility: "सुलभता",
+      largeText: "बड़ा टेक्स्ट",
+      highContrast: "उच्च कंट्रास्ट",
+      mapFilter: "मैप फिल्टर"
+    },
+    te: {
+      emergency: "అత్యవసరం",
+      services: "సేవలు",
+      map: "మ్యాప్",
+      suggest: "సూచించండి",
+      profile: "ప్రొఫైల్",
+      reportWrongInfo: "తప్పు సమాచారాన్ని నివేదించండి",
+      reportTitle: "సేవా వివరాల సవరణ నివేదిక",
+      reportHint: "ఏది సరిచేయాలో స్థానిక వాలంటీర్లకు తెలియజేయండి.",
+      reportPlaceholder: "ఫోన్ నంబర్ తప్పు, సమయం మారింది, స్థలం మూసివేశారు...",
+      submitReport: "నివేదిక పంపండి",
+      documentChecklist: "పత్రాల జాబితా",
+      actions: "త్వరిత చర్యలు",
+      copyPhone: "ఫోన్ కాపీ",
+      copyDetails: "వివరాలు కాపీ",
+      whatsapp: "WhatsApp",
+      share: "పంచుకోండి",
+      searchSuggestions: "సూచనలు",
+      emergencyIntro: "ఆరోగ్యం, భద్రత, ప్రజా సహాయం కోసం వేగవంతమైన సంప్రదింపులు.",
+      noEmergency: "ఈ ఫిల్టర్లలో అత్యవసర సేవలు లేవు.",
+      accessibility: "యాక్సెసిబిలిటీ",
+      largeText: "పెద్ద టెక్స్ట్",
+      highContrast: "హై కాంట్రాస్ట్",
+      mapFilter: "మ్యాప్ ఫిల్టర్"
+    },
+    kn: {
+      emergency: "ತುರ್ತು",
+      services: "ಸೇವೆಗಳು",
+      map: "ನಕ್ಷೆ",
+      suggest: "ಸೂಚಿಸಿ",
+      profile: "ಪ್ರೊಫೈಲ್",
+      reportWrongInfo: "ತಪ್ಪು ಮಾಹಿತಿಯನ್ನು ವರದಿ ಮಾಡಿ",
+      reportTitle: "ತಪ್ಪಾದ ಸೇವಾ ವಿವರ ವರದಿ",
+      reportHint: "ಯಾವ ವಿವರ ತಿದ್ದಬೇಕು ಎಂದು ಸ್ಥಳೀಯ ಸ್ವಯಂಸೇವಕರಿಗೆ ತಿಳಿಸಿ.",
+      reportPlaceholder: "ಫೋನ್ ಸಂಖ್ಯೆ ತಪ್ಪಾಗಿದೆ, ಸಮಯ ಬದಲಾಗಿದೆ, ಸ್ಥಳ ಮುಚ್ಚಿದೆ...",
+      submitReport: "ವರದಿ ಕಳುಹಿಸಿ",
+      documentChecklist: "ದಾಖಲೆಗಳ ಪಟ್ಟಿ",
+      actions: "ತ್ವರಿತ ಕ್ರಮಗಳು",
+      copyPhone: "ಫೋನ್ ನಕಲಿಸಿ",
+      copyDetails: "ವಿವರ ನಕಲಿಸಿ",
+      whatsapp: "WhatsApp",
+      share: "ಹಂಚಿ",
+      searchSuggestions: "ಸಲಹೆಗಳು",
+      emergencyIntro: "ಆರೋಗ್ಯ, ಭದ್ರತೆ ಮತ್ತು ಸಾರ್ವಜನಿಕ ಸಹಾಯಕ್ಕಾಗಿ ತುರ್ತು ಸಂಪರ್ಕಗಳು.",
+      noEmergency: "ಈ ಫಿಲ್ಟರ್‌ಗಳಲ್ಲಿ ತುರ್ತು ಸೇವೆಗಳು ಕಂಡುಬಂದಿಲ್ಲ.",
+      accessibility: "ಪ್ರವೇಶಯೋಗ್ಯತೆ",
+      largeText: "ದೊಡ್ಡ ಪಠ್ಯ",
+      highContrast: "ಹೈ ಕಾಂಟ್ರಾಸ್ಟ್",
+      mapFilter: "ನಕ್ಷೆ ಫಿಲ್ಟರ್"
+    }
+  }[language as 'en' | 'ml' | 'hi' | 'te' | 'kn'] || {
+    emergency: "Emergency",
+    services: "Services",
+    map: "Map",
+    suggest: "Suggest",
+    profile: "Profile",
+    reportWrongInfo: "Report wrong info",
+    reportTitle: "Report incorrect service details",
+    reportHint: "Tell local volunteers what needs correction.",
+    reportPlaceholder: "Phone number is wrong, timing changed, location closed...",
+    submitReport: "Submit report",
+    documentChecklist: "Document checklist",
+    actions: "Quick actions",
+    copyPhone: "Copy phone",
+    copyDetails: "Copy details",
+    whatsapp: "WhatsApp",
+    share: "Share",
+    searchSuggestions: "Suggestions",
+    emergencyIntro: "Fast access to urgent health, safety, and public support contacts.",
+    noEmergency: "No emergency services found for these filters.",
+    accessibility: "Accessibility",
+    largeText: "Large text",
+    highContrast: "High contrast",
+    mapFilter: "Map filter"
+  };
+  
+  // Tab controller state: 'services' | 'emergency' | 'map' | 'suggest' | 'profile'
+  const [currentTab, setCurrentTab] = useState<'services' | 'emergency' | 'map' | 'suggest' | 'profile'>('services');
+
+  // Offline access state
   const [isOfflineMode, setIsOfflineMode] = useState<boolean>(false);
   
   // Search state
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [isSearchFocused, setIsSearchFocused] = useState<boolean>(false);
   
   // Category state
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [mapCategoryFilter, setMapCategoryFilter] = useState<string>('all');
   
   // Location and proximity states (defaulted to Kozhikode / Mukkali)
   const [selectedDistrict, setSelectedDistrict] = useState<string>('Kozhikode');
@@ -117,6 +298,10 @@ function DirectoryApp() {
 
   // Load More state for performance optimization
   const [visibleCount, setVisibleCount] = useState<number>(50);
+  const [reportService, setReportService] = useState<ServiceItem | null>(null);
+  const [reportText, setReportText] = useState('');
+  const [isLargeText, setIsLargeText] = useState(false);
+  const [isHighContrast, setIsHighContrast] = useState(false);
 
   // Reset pagination when filters change to avoid unnecessary rendering overhead
   useEffect(() => {
@@ -177,7 +362,7 @@ function DirectoryApp() {
   
   // Modal state
   const [selectedDetailService, setSelectedDetailService] = useState<ServiceItem | null>(null);
-  const [detailPreviewLang, setDetailPreviewLang] = useState<'en' | 'hi' | 'te' | 'ml' | null>(null);
+  const [detailPreviewLang, setDetailPreviewLang] = useState<'en' | 'hi' | 'te' | 'ml' | 'kn' | null>(null);
 
   // Kerala map interactive zoom and pan states
   const [mapZoom, setMapZoom] = useState<number>(1);
@@ -449,7 +634,7 @@ function DirectoryApp() {
 
     // Find the localized district / locality name if possible for general storage
     const distLookup = KERALA_DISTRICTS.find(d => d.en === newDistrict);
-    const distLocalizedName = distLookup ? distLookup[language] || newDistrict : newDistrict;
+    const distLocalizedName = distLookup ? ((distLookup as any)[language] || newDistrict) : newDistrict;
 
     const serviceTranslationObj: ServiceTranslation = {
       title: newTitle,
@@ -463,11 +648,12 @@ function DirectoryApp() {
       contactName: newContact || "Community Volunteer"
     };
 
-    const translationsRecord: Record<'en' | 'hi' | 'te' | 'ml', ServiceTranslation> = {
+    const translationsRecord: Record<'en', ServiceTranslation> & Partial<Record<'hi' | 'te' | 'ml' | 'kn', ServiceTranslation>> = {
       en: { ...serviceTranslationObj, category: "Volunteer Suggestion" },
       hi: { ...serviceTranslationObj, title: `${newTitle} (स्वयंसेवक सुझाव)`, category: "स्वयंसेवक योगदान" },
       te: { ...serviceTranslationObj, title: `${newTitle} (స్వచ్ఛంద సేవ)`, category: "స్వచ్ఛంద ప్రతిపాదన" },
-      ml: { ...serviceTranslationObj, title: `${newTitle} (സന്നദ്ധസേവന സമർപ്പണം)`, category: "വോളണ്ടിയർ നിർദ്ദേശം" }
+      ml: { ...serviceTranslationObj, title: `${newTitle} (സന്നദ്ധസേവന സമർപ്പണം)`, category: "വോളണ്ടിയർ നിർദ്ദേശം" },
+      kn: { ...serviceTranslationObj, title: `${newTitle} (ಸ್ವಯಂಸೇವಕ ಸೂಚನೆ)`, category: "ಸ್ವಯಂಸೇವಕ ಸೂಚನೆ" }
     };
 
     const newService: ServiceItem = {
@@ -502,11 +688,11 @@ function DirectoryApp() {
 
   const getCategoryIcon = (categoryKey: string) => {
     switch (categoryKey) {
-      case 'health': return <HeartPulse className="w-5 h-5" />;
-      case 'water': return <Droplet className="w-5 h-5" />;
-      case 'agriculture': return <Sprout className="w-5 h-5" />;
-      case 'education': return <GraduationCap className="w-5 h-5" />;
-      default: return <Building2 className="w-5 h-5" />;
+      case 'health': return <Stethoscope className="w-5 h-5" />;
+      case 'water': return <Waves className="w-5 h-5" />;
+      case 'agriculture': return <Wheat className="w-5 h-5" />;
+      case 'education': return <School className="w-5 h-5" />;
+      default: return <Landmark className="w-5 h-5" />;
     }
   };
 
@@ -530,21 +716,149 @@ function DirectoryApp() {
     }
   };
 
-  // Custom icon mapping based on keywords to match mockups 100%
+  // Service-specific icons make dense directory rows easier to scan.
   const getCustomizedIcon = (service: ServiceItem) => {
     const titleLower = (service.translations.en?.title || '').toLowerCase();
+    const categoryLower = (service.translations.en?.category || '').toLowerCase();
+    const haystack = `${titleLower} ${categoryLower}`;
     const catLower = service.categoryKey;
     
-    if (titleLower.includes('police')) {
+    if (haystack.includes('police') || haystack.includes('security')) {
       return <Shield className="w-5 h-5" />;
     }
-    if (titleLower.includes('ration') || titleLower.includes('shop')) {
+    if (haystack.includes('hospital') || haystack.includes('taluk')) {
+      return <Hospital className="w-5 h-5" />;
+    }
+    if (haystack.includes('health') || haystack.includes('clinic') || haystack.includes('phc') || haystack.includes('fhc')) {
+      return <Stethoscope className="w-5 h-5" />;
+    }
+    if (haystack.includes('ambulance') || haystack.includes('emergency')) {
+      return <Ambulance className="w-5 h-5" />;
+    }
+    if (haystack.includes('water') || haystack.includes('jal') || haystack.includes('kwa')) {
+      return <Waves className="w-5 h-5" />;
+    }
+    if (haystack.includes('school') || haystack.includes('ghss') || haystack.includes('glps') || haystack.includes('education')) {
+      return <School className="w-5 h-5" />;
+    }
+    if (haystack.includes('library') || haystack.includes('book')) {
+      return <BookOpen className="w-5 h-5" />;
+    }
+    if (haystack.includes('krishi') || haystack.includes('farm') || haystack.includes('agri')) {
+      return <Wheat className="w-5 h-5" />;
+    }
+    if (haystack.includes('soil') || haystack.includes('lab') || haystack.includes('test')) {
+      return <FlaskConical className="w-5 h-5" />;
+    }
+    if (haystack.includes('ration') || haystack.includes('shop')) {
       return <Store className="w-5 h-5" />;
     }
-    if (titleLower.includes('anganwadi') || titleLower.includes('child')) {
+    if (haystack.includes('anganwadi') || haystack.includes('child')) {
       return <Baby className="w-5 h-5" />;
     }
+    if (haystack.includes('village') || haystack.includes('registry') || haystack.includes('panchayat') || haystack.includes('office')) {
+      return <Landmark className="w-5 h-5" />;
+    }
+    if (haystack.includes('certificate') || haystack.includes('document') || haystack.includes('revenue')) {
+      return <FileCheck2 className="w-5 h-5" />;
+    }
+    if (haystack.includes('pension') || haystack.includes('welfare') || haystack.includes('fund')) {
+      return <HandCoins className="w-5 h-5" />;
+    }
+    if (haystack.includes('bank') || haystack.includes('akshaya') || haystack.includes('e-centre')) {
+      return <Banknote className="w-5 h-5" />;
+    }
+    if (haystack.includes('bus') || haystack.includes('transport')) {
+      return <BusFront className="w-5 h-5" />;
+    }
+    if (haystack.includes('forest') || haystack.includes('garden')) {
+      return <Trees className="w-5 h-5" />;
+    }
+    if (haystack.includes('court') || haystack.includes('legal')) {
+      return <Scale className="w-5 h-5" />;
+    }
+    if (haystack.includes('housing') || haystack.includes('home')) {
+      return <Home className="w-5 h-5" />;
+    }
+    if (haystack.includes('application') || haystack.includes('register')) {
+      return <ClipboardList className="w-5 h-5" />;
+    }
     return getCategoryIcon(catLower);
+  };
+
+  const categoryOptions = [
+    { key: 'all', label: t.allCategories || 'All', icon: <Building2 className="w-3.5 h-3.5" /> },
+    { key: 'health', label: t.health || 'Health', icon: <HeartPulse className="w-3.5 h-3.5" /> },
+    { key: 'education', label: t.education || 'Education', icon: <GraduationCap className="w-3.5 h-3.5" /> },
+    { key: 'government', label: t.government || 'Government', icon: <Shield className="w-3.5 h-3.5" /> },
+    { key: 'water', label: t.water || 'Water', icon: <Droplet className="w-3.5 h-3.5" /> },
+    { key: 'agriculture', label: t.agriculture || 'Agriculture', icon: <Sprout className="w-3.5 h-3.5" /> }
+  ];
+
+  const getServiceShareText = (service: ServiceItem): string => {
+    const data = service.translations[language] || service.translations.en;
+    return `${data.title}\n${data.location}\n${data.hours}\nPhone: ${service.phoneNumber}`;
+  };
+
+  const copyText = async (text: string, label: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setSuccessToast(label);
+    } catch {
+      setSuccessToast(text);
+    }
+    setTimeout(() => setSuccessToast(null), 2200);
+  };
+
+  const shareService = async (service: ServiceItem) => {
+    const data = service.translations[language] || service.translations.en;
+    const text = getServiceShareText(service);
+    if (navigator.share) {
+      await navigator.share({ title: data.title, text }).catch(() => undefined);
+    } else {
+      await copyText(text, 'Service details copied');
+    }
+  };
+
+  const submitReport = () => {
+    if (!reportService || !reportText.trim()) return;
+    const report = {
+      serviceId: reportService.id,
+      title: reportService.translations.en.title,
+      message: reportText.trim(),
+      createdAt: new Date().toISOString()
+    };
+    const saved = localStorage.getItem('gramseva_reports');
+    const reports = saved ? JSON.parse(saved) : [];
+    localStorage.setItem('gramseva_reports', JSON.stringify([report, ...reports]));
+    setReportService(null);
+    setReportText('');
+    setSuccessToast('Report saved for volunteer review');
+    setTimeout(() => setSuccessToast(null), 2200);
+  };
+
+  const getDocumentChecklist = (service: ServiceItem): string[] => {
+    const title = service.translations.en.title.toLowerCase();
+    const category = service.categoryKey;
+    if (title.includes('akshaya') || title.includes('e-centre')) {
+      return ['Aadhaar card', 'Mobile number linked to Aadhaar', 'Service-specific certificate or application number', 'Fee receipt if applicable'];
+    }
+    if (title.includes('village') || title.includes('registry') || category === 'government') {
+      return ['Aadhaar or voter ID', 'Address proof', 'Previous certificate or application number', 'Passport-size photo if required'];
+    }
+    if (category === 'health') {
+      return ['Aadhaar or health ID', 'Previous prescription or health card', 'Vaccination card for children', 'Emergency contact number'];
+    }
+    if (category === 'education') {
+      return ['Student ID or birth certificate', 'Parent Aadhaar/contact number', 'Previous school record if available', 'Address proof'];
+    }
+    if (category === 'water') {
+      return ['Consumer number if available', 'Address proof', 'Recent bill or connection receipt', 'Photo of issue for complaints'];
+    }
+    if (category === 'agriculture') {
+      return ['Land tax receipt or farmer ID', 'Aadhaar card', 'Bank passbook copy', 'Krishi registration number if available'];
+    }
+    return ['Aadhaar card', 'Address proof', 'Phone number', 'Relevant application or receipt'];
   };
 
   // Filter and search logic
@@ -602,76 +916,98 @@ function DirectoryApp() {
     filteredServices.sort((a, b) => getSimulatedDistance(a) - getSimulatedDistance(b));
   }
 
+  const emergencyServices = filteredServices.filter((service) => (
+    service.isEmergency ||
+    service.categoryKey === 'health' ||
+    /police|ambulance|hospital|fire|emergency|helpline/i.test(service.translations.en.title)
+  )).slice(0, 24);
+
+  const mapServices = filteredServices.filter((service) => (
+    mapCategoryFilter === 'all' || service.categoryKey === mapCategoryFilter
+  ));
+
+  const searchSuggestions = searchQuery.trim().length > 0
+    ? filteredServices.slice(0, 5).map((service) => {
+        const data = service.translations[language] || service.translations.en;
+        return { id: service.id, label: data.title, helper: data.category };
+      })
+    : [
+        { id: 'birth certificate', label: 'Birth certificate', helper: t.government || 'Government' },
+        { id: 'ration card', label: 'Ration card', helper: t.government || 'Government' },
+        { id: 'water connection', label: 'Water connection', helper: t.water || 'Water' },
+        { id: 'family health centre', label: 'Family Health Centre', helper: t.health || 'Health' }
+      ];
+
   return (
-    <div id="dir-app-root" className="min-h-screen bg-zinc-950 text-slate-100 font-sans antialiased flex flex-col xl:flex-row items-center justify-center p-0 sm:p-6 transition-all duration-300">
+    <div id="dir-app-root" className={`min-h-screen ${isHighContrast ? 'bg-black' : 'bg-[#f4f1e8]'} text-slate-900 font-sans antialiased flex flex-col 2xl:flex-row items-stretch 2xl:items-center justify-center p-0 sm:p-6 transition-all duration-300 ${isLargeText ? 'text-[110%]' : ''}`}>
       
-      {/* Floating Left Presentation Info Board (Desktop only) */}
-      <div className="hidden xl:flex flex-col max-w-sm mr-8 bg-zinc-900/90 border border-zinc-800 p-8 rounded-[32px] space-y-6 shadow-2xl">
+      {/* Desktop context panel */}
+      <div className="hidden 2xl:flex flex-col max-w-xs mr-6 bg-white border border-stone-200 p-6 rounded-2xl space-y-6 shadow-sm">
         <div className="flex items-center space-x-3">
-          <div className="p-3 bg-emerald-600 text-white rounded-2xl shadow-lg shadow-emerald-500/20">
+          <div className="p-3 bg-emerald-700 text-white rounded-xl shadow-sm">
             <Languages className="w-6 h-6" />
           </div>
           <div>
-            <h1 className="text-xl font-black text-white tracking-tight">GraamSeva</h1>
-            <p className="text-xs text-emerald-400 font-bold uppercase tracking-wider">Mobile PWA Simulator</p>
+            <h1 className="font-classical text-3xl font-extrabold text-slate-950 tracking-tight">GramSeva</h1>
+            <p className="font-label text-[10px] text-emerald-700 font-bold uppercase tracking-wider">Local service directory</p>
           </div>
         </div>
 
-        <p className="text-sm text-zinc-400 leading-relaxed">
-          Interact with a fully-functional, high-fidelity smartphone simulation of <strong>GraamSeva</strong>. Designed precisely to match offline-first vernacular requirements with live state synchronization.
+        <p className="text-sm text-slate-600 leading-relaxed">
+          A practical directory for panchayat-level services in Kerala. Residents can search by place, language, category, timings, and verified contact details without digging through scattered sources.
         </p>
 
         <div className="space-y-3 pt-2">
-          <div className="flex items-center space-x-3 text-xs font-semibold text-zinc-300">
-            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span>Kozhikode & Mukkali Pre-selected</span>
+          <div className="flex items-center space-x-3 text-xs font-semibold text-slate-700">
+            <div className="w-2 h-2 rounded-full bg-emerald-700" />
+            <span>Kozhikode and Mukkali data ready on launch</span>
           </div>
-          <div className="flex items-center space-x-3 text-xs font-semibold text-zinc-300">
-            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span>Interactive Panning & Zoomable Map</span>
+          <div className="flex items-center space-x-3 text-xs font-semibold text-slate-700">
+            <div className="w-2 h-2 rounded-full bg-emerald-700" />
+            <span>Map view for nearby public facilities</span>
           </div>
-          <div className="flex items-center space-x-3 text-xs font-semibold text-zinc-300">
-            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span>3 Vernacular Quick Toggles</span>
+          <div className="flex items-center space-x-3 text-xs font-semibold text-slate-700">
+            <div className="w-2 h-2 rounded-full bg-emerald-700" />
+            <span>English, Malayalam, Hindi, and Telugu content</span>
           </div>
-          <div className="flex items-center space-x-3 text-xs font-semibold text-zinc-300">
-            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span>Offline Database Sandbox</span>
+          <div className="flex items-center space-x-3 text-xs font-semibold text-slate-700">
+            <div className="w-2 h-2 rounded-full bg-emerald-700" />
+            <span>Local storage keeps added services available</span>
           </div>
         </div>
 
-        <div className="pt-4 border-t border-zinc-800 text-[11px] text-zinc-500 font-medium">
-          Use the phone's bottom navigation bar to transition between the active directory listings, the geographic location hub, and simulation tools.
+        <div className="pt-4 border-t border-stone-200 text-[11px] text-slate-500 font-medium leading-relaxed">
+          Built as a resident-facing prototype: search the directory, view facilities on the map, add suggestions, and manage local data from the profile tab.
         </div>
       </div>
 
-      {/* Main Smartphone Shell Mockup Frame */}
-      <div className="relative w-full max-w-[415px] h-[845px] sm:h-[830px] bg-[#121214] sm:rounded-[55px] sm:border-[12px] sm:border-zinc-800/90 sm:shadow-[0_25px_65px_-15px_rgba(0,0,0,0.95)] flex flex-col overflow-hidden transition-all">
+      {/* App frame */}
+      <div className="relative w-full max-w-none lg:max-w-[1180px] 2xl:max-w-[1080px] h-dvh min-h-[620px] sm:h-[calc(100vh-48px)] sm:min-h-[720px] bg-[#121214] sm:rounded-3xl sm:border sm:border-stone-300 sm:shadow-xl flex flex-col overflow-hidden transition-all">
         
         {/* Dynamic Mobile Banner Header block */}
-        <div className="bg-gradient-to-br from-[#0c594d] via-[#0d9488] to-[#047857] text-white p-4 pt-8 pb-5 shrink-0 flex flex-col gap-2 relative shadow-lg">
+        <div className="bg-gradient-to-br from-[#0c594d] via-[#0d9488] to-[#047857] text-white p-4 sm:p-5 lg:p-6 pt-8 sm:pt-6 pb-5 shrink-0 flex flex-col gap-2 relative shadow-lg">
           
           {/* Virtual OS Status Bar */}
           <div className="h-6 flex justify-between items-center text-[12px] text-white/95 font-semibold px-1 mb-1">
             <span>9:41</span>
-            <span className="text-[11px] font-extrabold tracking-widest text-emerald-100 uppercase">GraamSeva</span>
+            <span className="font-label text-[10px] font-extrabold tracking-widest text-emerald-100 uppercase">GramSeva</span>
             <div className={`flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-[9px] font-bold border transition-colors ${
               isOfflineMode 
                 ? 'bg-amber-500/20 text-amber-300 border-amber-500/30' 
                 : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
             }`}>
               <span className={`w-1.5 h-1.5 rounded-full ${isOfflineMode ? 'bg-amber-400' : 'bg-emerald-400 animate-pulse'}`} />
-              <span>Offline Ready</span>
+              <span className="font-label">Offline Ready</span>
             </div>
           </div>
 
           {/* Panchayat Branding */}
           <div className="flex justify-between items-start gap-2 mt-1">
             <div className="flex-1 min-w-0">
-              <h2 className="text-lg font-black text-white tracking-tight truncate leading-none">
+              <h2 className="font-classical text-2xl lg:text-3xl font-black text-white tracking-tight truncate leading-none">
                 {selectedLocality === 'all' ? 'Manjeshwaram' : selectedLocality} Panchayat
               </h2>
-              <p className="text-[11px] text-emerald-100/95 font-semibold tracking-wide mt-1">
+              <p className="text-xs lg:text-sm text-emerald-100/95 font-semibold tracking-wide mt-1">
                 {selectedDistrict} District &middot; {filteredServices.length} services
               </p>
             </div>
@@ -681,13 +1017,15 @@ function DirectoryApp() {
               {[
                 { code: 'en', label: 'EN' },
                 { code: 'ml', label: 'മല' },
-                { code: 'hi', label: 'हि' }
+                { code: 'hi', label: 'हि' },
+                { code: 'te', label: 'తె' },
+                { code: 'kn', label: 'ಕ' }
               ].map((lang) => {
                 const isActive = language === lang.code;
                 return (
                   <button
                     key={lang.code}
-                    onClick={() => setLanguage(lang.code)}
+                    onClick={() => setLanguage(lang.code as any)}
                     className={`px-2 py-0.5 rounded text-[10px] font-extrabold tracking-tight transition ${
                       isActive 
                         ? 'bg-white text-emerald-900 shadow-xs' 
@@ -701,24 +1039,43 @@ function DirectoryApp() {
             </div>
           </div>
 
-          {/* White Border Styled Mockup Search Input */}
-          <div className="bg-white rounded-2xl p-1 shadow-md flex items-center mt-3 border border-slate-100">
-            <Search className="w-4 h-4 text-slate-400 ml-3 shrink-0" />
-            <input
-              type="text"
-              placeholder={t.searchPlaceholder || "Search services..."}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full text-slate-800 placeholder-slate-400 bg-transparent text-xs py-1.5 px-2.5 outline-none border-none leading-none font-medium"
-            />
-            {searchQuery ? (
-              <button onClick={() => setSearchQuery('')} className="p-1 text-slate-400 hover:text-slate-600 mr-2">
-                <X className="w-3.5 h-3.5" />
-              </button>
-            ) : (
-              <span className="w-4 h-4 rounded-full bg-slate-100 mr-3 shrink-0 flex items-center justify-center">
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
-              </span>
+          {/* Primary search input */}
+          <div className="relative md:max-w-3xl">
+            <div className="bg-white rounded-2xl p-1 shadow-md flex items-center mt-3 border border-slate-100">
+              <Search className="w-4 h-4 text-slate-400 ml-3 shrink-0" />
+              <input
+                type="text"
+                placeholder={t.searchPlaceholder || "Search services..."}
+                value={searchQuery}
+                onFocus={() => setIsSearchFocused(true)}
+                onBlur={() => setTimeout(() => setIsSearchFocused(false), 140)}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full text-slate-800 placeholder-slate-400 bg-transparent text-xs py-1.5 px-2.5 outline-none border-none leading-none font-medium"
+              />
+              {searchQuery ? (
+                <button onClick={() => setSearchQuery('')} className="p-1 text-slate-400 hover:text-slate-600 mr-2" aria-label="Clear search">
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              ) : (
+                <span className="w-4 h-4 rounded-full bg-slate-100 mr-3 shrink-0 flex items-center justify-center">
+                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
+                </span>
+              )}
+            </div>
+            {isSearchFocused && searchSuggestions.length > 0 && (
+              <div className="absolute top-full mt-2 left-0 right-0 z-40 bg-white text-slate-900 border border-slate-200 rounded-2xl shadow-xl p-2">
+                <div className="px-2 pb-1 text-[10px] font-black uppercase tracking-wider text-slate-400">{ui.searchSuggestions}</div>
+                {searchSuggestions.map((item) => (
+                  <button
+                    key={item.id}
+                    onMouseDown={() => setSearchQuery(item.label)}
+                    className="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100 transition flex items-center justify-between gap-3"
+                  >
+                    <span className="text-xs font-bold truncate">{item.label}</span>
+                    <span className="text-[10px] text-emerald-700 font-bold shrink-0">{item.helper}</span>
+                  </button>
+                ))}
+              </div>
             )}
           </div>
 
@@ -731,15 +1088,8 @@ function DirectoryApp() {
           {currentTab === 'services' && (
             <>
               {/* Category Horizontal Filter Row */}
-              <div className="flex overflow-x-auto gap-2 px-4 py-3 bg-[#18181b] border-b border-zinc-800/80 scrollbar-none shrink-0 select-none">
-                {[
-                  { key: 'all', label: 'All', icon: <Building2 className="w-3.5 h-3.5" /> },
-                  { key: 'health', label: 'Health', icon: <HeartPulse className="w-3.5 h-3.5" /> },
-                  { key: 'education', label: 'Education', icon: <GraduationCap className="w-3.5 h-3.5" /> },
-                  { key: 'government', label: 'Revenue', icon: <Shield className="w-3.5 h-3.5" /> },
-                  { key: 'water', label: 'Water', icon: <Droplet className="w-3.5 h-3.5" /> },
-                  { key: 'agriculture', label: 'Agriculture', icon: <Sprout className="w-3.5 h-3.5" /> }
-                ].map((cat) => {
+              <div className="flex overflow-x-auto gap-2 px-4 sm:px-5 lg:px-6 py-3 bg-[#18181b] border-b border-zinc-800/80 scrollbar-none shrink-0 select-none">
+                {categoryOptions.map((cat) => {
                   const isActive = selectedCategory === cat.key;
                   return (
                     <button
@@ -752,20 +1102,20 @@ function DirectoryApp() {
                       }`}
                     >
                       {cat.icon}
-                      <span>{cat.label}</span>
+                <span className="font-label text-[11px]">{cat.label}</span>
                     </button>
                   );
                 })}
               </div>
 
               {/* Dynamic scrollable directory area */}
-              <div className="flex-1 overflow-y-auto px-4 pt-3 pb-24 scrollbar-none space-y-3">
-                <div className="flex justify-between items-center text-[11px] font-black tracking-wider text-zinc-500 uppercase px-1 mb-1">
+              <div className="flex-1 overflow-y-auto px-4 sm:px-5 lg:px-8 pt-3 sm:pt-5 pb-24 scrollbar-none space-y-3 lg:grid lg:grid-cols-2 lg:gap-5 lg:space-y-0 lg:items-start">
+                <div className="flex justify-between items-center text-xs font-black tracking-wider text-zinc-500 uppercase px-1 mb-1 lg:col-span-2">
                   <span>Nearby Services</span>
                   <span>{filteredServices.length} listed</span>
                 </div>
 
-                <AnimatePresence mode="popLayout">
+                <AnimatePresence initial={false}>
                   {filteredServices.length > 0 ? (
                     filteredServices.slice(0, visibleCount).map((service, index) => {
                       const data = service.translations[language] || service.translations['en'];
@@ -790,7 +1140,7 @@ function DirectoryApp() {
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ duration: 0.2, delay: Math.min(index * 0.04, 0.2) }}
                           onClick={() => setSelectedDetailService(service)}
-                          className="bg-zinc-900/95 border border-zinc-800/80 rounded-2xl p-4 cursor-pointer hover:bg-zinc-850 hover:border-zinc-700 transition flex gap-3 shadow-md relative overflow-hidden"
+                          className="bg-zinc-900/95 border border-zinc-800/80 rounded-2xl p-4 sm:p-5 min-h-[128px] lg:min-h-[154px] cursor-pointer hover:bg-zinc-850 hover:border-zinc-700 transition flex gap-3 sm:gap-4 shadow-md relative overflow-hidden"
                         >
                           {/* Emergency Stripe */}
                           {service.isEmergency && (
@@ -798,43 +1148,47 @@ function DirectoryApp() {
                           )}
 
                           {/* Customized icon wrapper on left */}
-                          <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${getCategoryColor(service.categoryKey)}`}>
+                          <div className={`w-12 h-12 lg:w-13 lg:h-13 rounded-xl flex items-center justify-center shrink-0 ${getCategoryColor(service.categoryKey)}`}>
                             {getCustomizedIcon(service)}
                           </div>
 
                           {/* Detail block on right */}
                           <div className="flex-1 min-w-0">
-                            <div className="flex items-start justify-between gap-1">
-                              <h3 className="text-xs font-black text-white leading-tight truncate tracking-tight pr-1">
+                            <div className="flex items-start justify-between gap-2">
+                              <h3 className="font-classical text-base font-black text-white leading-snug tracking-tight pr-1 line-clamp-2">
                                 {data.title}
                               </h3>
                               
                               {/* Status indicator capsule */}
                               {isVerifiedPulse ? (
-                                <span className="shrink-0 text-[8px] font-black tracking-tight text-emerald-400 bg-emerald-950/40 border border-emerald-500/20 px-1.5 py-0.5 rounded-full flex items-center gap-1">
+                                <span className="shrink-0 text-[9px] font-black tracking-tight text-emerald-400 bg-emerald-950/40 border border-emerald-500/20 px-2 py-0.5 rounded-full flex items-center gap-1">
                                   <span className="w-1 h-1 rounded-full bg-emerald-400 animate-ping" />
-                                  <span>Verified</span>
+                                  <span className="font-label">Verified</span>
                                 </span>
                               ) : (
-                                <span className="shrink-0 text-[8px] font-black tracking-tight text-amber-400 bg-amber-950/40 border border-amber-500/20 px-1.5 py-0.5 rounded-full">
+                                <span className="shrink-0 text-[9px] font-black tracking-tight text-amber-400 bg-amber-950/40 border border-amber-500/20 px-2 py-0.5 rounded-full">
                                   May be outdated
                                 </span>
                               )}
                             </div>
 
-                            <p className="text-[10px] text-zinc-400 font-bold tracking-tight uppercase mt-0.5">
+                            <p className="font-label text-[10px] text-zinc-400 font-bold tracking-wide uppercase mt-1">
                               {data.category}
                             </p>
 
+                            <p className="hidden sm:block text-xs lg:text-[11px] text-zinc-400/90 leading-relaxed mt-2 line-clamp-2">
+                              {data.description}
+                            </p>
+
                             {/* Info Badges */}
-                            <div className="flex items-center gap-3 text-[10px] text-zinc-500 font-semibold mt-2.5">
+                            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-zinc-500 font-semibold mt-2.5">
                               <div className="flex items-center gap-1">
                                 <MapPin className="w-3 h-3 text-emerald-500" />
                                 <span>{getSimulatedDistance(service)} km</span>
                               </div>
                               <div className="flex items-center gap-1">
                                 <Clock className="w-3 h-3 text-zinc-500" />
-                                <span className="truncate max-w-[100px]">{data.hours}</span>
+                                <span className="truncate max-w-[170px] sm:max-w-[360px] lg:max-w-[220px]">{data.hours}</span>
                               </div>
                             </div>
                           </div>
@@ -843,7 +1197,7 @@ function DirectoryApp() {
                       );
                     })
                   ) : (
-                    <div className="text-center py-12 px-4 bg-zinc-900/40 border border-zinc-800/50 rounded-2xl">
+                    <div className="text-center py-12 px-4 bg-zinc-900/40 border border-zinc-800/50 rounded-2xl lg:col-span-2">
                       <HelpCircle className="w-8 h-8 text-zinc-600 mx-auto mb-2" />
                       <p className="text-zinc-400 text-xs font-bold">{t.noServicesFound || "No services found"}</p>
                       <button
@@ -862,7 +1216,7 @@ function DirectoryApp() {
                 </AnimatePresence>
 
                 {filteredServices.length > visibleCount && (
-                  <div className="pt-2 pb-4 text-center">
+                  <div className="pt-2 pb-4 text-center lg:col-span-2">
                     <button
                       onClick={() => setVisibleCount(p => p + 100)}
                       className="w-full py-3 bg-zinc-900 border border-zinc-800 hover:bg-zinc-850 text-emerald-400 font-extrabold text-xs uppercase tracking-widest rounded-2xl transition shadow-md active:scale-98"
@@ -878,24 +1232,94 @@ function DirectoryApp() {
             </>
           )}
 
+          {/* Tab Content 2: Emergency quick access */}
+          {currentTab === 'emergency' && (
+            <div className="flex-1 overflow-y-auto px-4 sm:px-5 lg:px-8 pt-4 sm:pt-5 pb-24 scrollbar-none space-y-4">
+              <div className="bg-rose-950/40 border border-rose-500/20 rounded-2xl p-4 flex items-start gap-3">
+                <div className="w-11 h-11 rounded-xl bg-rose-500/15 text-rose-300 flex items-center justify-center shrink-0">
+                  <Siren className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-classical text-xl text-white font-black">{ui.emergency}</h3>
+                  <p className="text-xs text-rose-100/75 leading-relaxed mt-1">{ui.emergencyIntro}</p>
+                </div>
+              </div>
+
+              {emergencyServices.length > 0 ? (
+                <div className="grid gap-3 lg:grid-cols-2">
+                  {emergencyServices.map((service) => {
+                    const data = service.translations[language] || service.translations.en;
+                    return (
+                      <div key={service.id} className="bg-zinc-900/95 border border-zinc-800 rounded-2xl p-4 flex gap-3">
+                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${getCategoryColor(service.categoryKey)}`}>
+                          {service.isEmergency ? <AlertTriangle className="w-5 h-5" /> : getCustomizedIcon(service)}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-start justify-between gap-2">
+                            <h4 className="font-classical text-base text-white font-black leading-snug line-clamp-2">{data.title}</h4>
+                            <span className="text-[9px] text-rose-300 bg-rose-500/10 border border-rose-500/20 px-2 py-0.5 rounded-full font-bold shrink-0">Urgent</span>
+                          </div>
+                          <p className="text-xs text-zinc-400 mt-1 line-clamp-2">{data.location}</p>
+                          <div className="grid grid-cols-2 gap-2 mt-3">
+                            <a href={`tel:${service.phoneNumber}`} className="flex items-center justify-center gap-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white py-2 text-[11px] font-black">
+                              <Phone className="w-3.5 h-3.5" />
+                              Call
+                            </a>
+                            <button onClick={() => setSelectedDetailService(service)} className="rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-100 py-2 text-[11px] font-black">
+                              Details
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="text-center py-12 px-4 bg-zinc-900/40 border border-zinc-800/50 rounded-2xl">
+                  <AlertTriangle className="w-8 h-8 text-zinc-600 mx-auto mb-2" />
+                  <p className="text-zinc-400 text-xs font-bold">{ui.noEmergency}</p>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Tab Content 2: Full interactive vector map */}
           {currentTab === 'map' && (
             <div className="flex-1 flex flex-col relative select-none">
               
               {/* Floating Map HUD header */}
-              <div className="absolute top-3 inset-x-3 z-30 bg-zinc-950/90 border border-zinc-850 p-2.5 rounded-xl flex items-center justify-between text-[11px] text-zinc-300 font-bold gap-2 shadow-lg backdrop-blur-xs">
-                <div className="flex items-center gap-1.5 text-white">
+              <div className="absolute top-3 inset-x-3 md:inset-x-6 z-30 bg-zinc-950/90 border border-zinc-850 p-2.5 md:p-3 rounded-xl flex flex-wrap items-center justify-between text-[11px] md:text-xs text-zinc-300 font-bold gap-2 shadow-lg backdrop-blur-xs">
+                <div className="font-label flex items-center gap-1.5 text-white min-w-0">
                   <Compass className="w-3.5 h-3.5 text-emerald-400 animate-spin" style={{ animationDuration: '24s' }} />
-                  <span>{selectedDistrict.toUpperCase()} LOCATION HUB</span>
+                  <span className="truncate">{selectedDistrict.toUpperCase()} LOCATION HUB</span>
                 </div>
-                <span className="text-[9px] text-zinc-500 font-mono">Zoom: {Math.round(mapZoom * 100)}%</span>
+                <span className="text-[9px] text-zinc-500 font-label">Zoom: {Math.round(mapZoom * 100)}%</span>
               </div>
 
               {/* Vector Map Container */}
               <div className="flex-1 bg-[#ecf9ff] relative overflow-hidden select-none">
+                <div className="absolute top-18 md:top-20 left-3 md:left-6 right-3 md:right-auto md:max-w-xl z-30 flex gap-2 overflow-x-auto scrollbar-none">
+                  {categoryOptions.map((cat) => {
+                    const isActive = mapCategoryFilter === cat.key;
+                    return (
+                      <button
+                        key={cat.key}
+                        onClick={() => setMapCategoryFilter(cat.key)}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-[10px] font-bold whitespace-nowrap ${
+                          isActive
+                            ? 'bg-zinc-950 text-white border-zinc-800'
+                            : 'bg-white/90 text-slate-700 border-slate-200 hover:bg-white'
+                        }`}
+                      >
+                        <Filter className="w-3 h-3" />
+                        {cat.label}
+                      </button>
+                    );
+                  })}
+                </div>
                 
                 {/* Floating Map Zoom/Reset Controllers */}
-                <div className="absolute right-3 bottom-20 z-30 flex flex-col gap-1.5 select-none">
+                <div className="absolute right-3 md:right-6 bottom-20 md:bottom-24 z-30 flex flex-col gap-1.5 select-none">
                   <button 
                     onClick={() => setMapZoom(p => Math.min(4, p + 0.3))}
                     className="w-8 h-8 bg-zinc-900 border border-zinc-800 text-white rounded-lg flex items-center justify-center transition active:scale-90"
@@ -1051,15 +1475,37 @@ function DirectoryApp() {
                     </>
                   )}
 
+                  {mapServices.slice(0, 8).map((service, idx) => {
+                    const data = service.translations[language] || service.translations.en;
+                    const x = 28 + ((idx * 9) % 38);
+                    const y = 24 + ((idx * 13) % 48);
+                    return (
+                      <button
+                        key={`map-${service.id}`}
+                        onClick={() => setSelectedDetailService(service)}
+                        style={{ left: `${x}%`, top: `${y}%` }}
+                        className="absolute z-30 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group"
+                        title={data.title}
+                      >
+                        <span className={`w-7 h-7 rounded-full border-2 border-white flex items-center justify-center shadow-lg ${service.isEmergency ? 'bg-rose-600 text-white' : 'bg-emerald-700 text-white'}`}>
+                          {getCustomizedIcon(service)}
+                        </span>
+                        <span className="mt-1 max-w-[100px] truncate bg-white/95 text-slate-800 border border-slate-200 px-1.5 py-0.5 rounded text-[8px] font-black shadow-sm">
+                          {data.title}
+                        </span>
+                      </button>
+                    );
+                  })}
+
                 </div>
 
               </div>
 
               {/* Map instructions panel */}
-              <div className="absolute bottom-18 inset-x-3 bg-zinc-950/95 border border-zinc-800/80 p-3 rounded-2xl flex flex-col gap-1 select-none shadow-lg">
-                <span className="text-[10px] font-black text-white uppercase tracking-wider">Kerala Grid Operations</span>
+              <div className="absolute bottom-18 md:bottom-20 inset-x-3 md:left-6 md:right-auto md:max-w-md bg-zinc-950/95 border border-zinc-800/80 p-3 rounded-2xl flex flex-col gap-1 select-none shadow-lg">
+                <span className="font-label text-[10px] font-black text-white uppercase tracking-wider">Kerala Grid Operations</span>
                 <p className="text-[9px] text-zinc-400 leading-tight">
-                  Drag the viewport to explore the coast. Click any district node to jump localities and filter nearby service records instantly.
+                  Drag the viewport to explore the coast. Showing {mapServices.length} services for the current map filter.
                 </p>
               </div>
 
@@ -1068,9 +1514,9 @@ function DirectoryApp() {
 
           {/* Tab Content 3: Suggest local service form */}
           {currentTab === 'suggest' && (
-            <div className="flex-1 overflow-y-auto px-5 pt-3 pb-24 scrollbar-none space-y-4">
-              <div className="border-b border-zinc-800 pb-2">
-                <h3 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-1.5">
+            <div className="flex-1 overflow-y-auto px-4 md:px-6 pt-4 md:pt-6 pb-24 scrollbar-none">
+              <div className="border-b border-zinc-800 pb-3 max-w-5xl mx-auto">
+                <h3 className="font-classical text-lg font-black text-white tracking-wide flex items-center gap-1.5">
                   <Plus className="w-4 h-4 text-emerald-400" />
                   <span>{t.addServiceTitle || "Suggest Service"}</span>
                 </h3>
@@ -1079,9 +1525,9 @@ function DirectoryApp() {
                 </p>
               </div>
 
-              <form onSubmit={handleAddService} className="space-y-3.5 text-xs">
+              <form onSubmit={handleAddService} className="max-w-5xl mx-auto mt-4 grid gap-3.5 text-xs md:grid-cols-2">
                 
-                <div>
+                <div className="md:col-span-2">
                   <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">
                     Service Title *
                   </label>
@@ -1095,7 +1541,7 @@ function DirectoryApp() {
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:col-span-2">
                   <div>
                     <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">
                       Category *
@@ -1128,7 +1574,7 @@ function DirectoryApp() {
                   </div>
                 </div>
 
-                <div>
+                <div className="md:col-span-2">
                   <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">
                     Description & Service details *
                   </label>
@@ -1142,7 +1588,7 @@ function DirectoryApp() {
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:col-span-2">
                   <div>
                     <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">
                       Operating Hours
@@ -1169,7 +1615,7 @@ function DirectoryApp() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:col-span-2">
                   <div>
                     <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">
                       District
@@ -1204,7 +1650,7 @@ function DirectoryApp() {
                   </div>
                 </div>
 
-                <div>
+                <div className="md:col-span-2">
                   <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">
                     Landmark / Address
                   </label>
@@ -1217,7 +1663,7 @@ function DirectoryApp() {
                   />
                 </div>
 
-                <div className="flex items-center space-x-2 pt-1">
+                <div className="flex items-center space-x-2 pt-1 md:col-span-2">
                   <input
                     type="checkbox"
                     id="mobile-em-chk"
@@ -1232,7 +1678,7 @@ function DirectoryApp() {
 
                 <button
                   type="submit"
-                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl transition mt-3 shadow-lg uppercase tracking-wider text-[11px]"
+                  className="w-full md:max-w-sm bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl transition mt-3 shadow-lg uppercase tracking-wider text-[11px] md:col-span-2"
                 >
                   {t.submitBtn || "Submit to Local Directory"}
                 </button>
@@ -1243,24 +1689,25 @@ function DirectoryApp() {
 
           {/* Tab Content 4: Profile / Diagnostic settings */}
           {currentTab === 'profile' && (
-            <div className="flex-1 overflow-y-auto px-5 pt-3 pb-24 scrollbar-none space-y-4">
-              <div className="border-b border-zinc-800 pb-2">
-                <h3 className="text-sm font-black text-white uppercase tracking-wider">
-                  Volunteer Settings & Diagnostics
+            <div className="flex-1 overflow-y-auto px-4 md:px-6 pt-4 md:pt-6 pb-24 scrollbar-none">
+              <div className="border-b border-zinc-800 pb-3 max-w-5xl mx-auto">
+                <h3 className="font-classical text-lg font-black text-white tracking-wide">
+                  Directory Settings
                 </h3>
                 <p className="text-[10px] text-zinc-400 mt-0.5">
-                  Offline database controls and search configuration logs.
+                  Local data controls, place filters, and offline access.
                 </p>
               </div>
 
               {/* State Controls Block */}
+              <div className="max-w-5xl mx-auto mt-4 grid gap-4 lg:grid-cols-[1.3fr_0.7fr]">
               <div className="bg-zinc-900/80 border border-zinc-800 rounded-2xl p-4 space-y-4 shadow-md">
                 
                 {/* Simulated Offline Switch */}
                 <div className="flex items-center justify-between">
                   <div>
-                    <span className="text-[11px] font-black text-white block uppercase tracking-wider">Simulated Network Status</span>
-                    <span className="text-[9px] text-zinc-400 block">Force offline database mode sandbox</span>
+                    <span className="text-[11px] font-black text-white block uppercase tracking-wider">Network Status</span>
+                    <span className="text-[9px] text-zinc-400 block">Use locally saved directory data</span>
                   </div>
                   <button
                     onClick={() => setIsOfflineMode(!isOfflineMode)}
@@ -1278,7 +1725,7 @@ function DirectoryApp() {
                 <div className="pt-3 border-t border-zinc-800/80 space-y-3">
                   <span className="text-[10px] font-black text-zinc-500 block uppercase tracking-wider">Location Config</span>
                   
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                       <label className="text-[9px] text-zinc-400 font-bold uppercase tracking-wider block mb-1">District</label>
                       <select
@@ -1317,8 +1764,8 @@ function DirectoryApp() {
                 <div className="pt-3 border-t border-zinc-800/80 space-y-3">
                   <div className="flex items-center justify-between">
                     <div>
-                      <span className="text-[11px] font-black text-white block uppercase tracking-wider">Simulate client GPS location</span>
-                      <span className="text-[9px] text-zinc-400 block">Emulates mobile GPS coordinates tracking</span>
+                      <span className="text-[11px] font-black text-white block uppercase tracking-wider">Nearby Services</span>
+                      <span className="text-[9px] text-zinc-400 block">Sort and filter by approximate distance</span>
                     </div>
                     <button
                       onClick={() => {
@@ -1362,19 +1809,37 @@ function DirectoryApp() {
 
               {/* Cache status report */}
               <div className="bg-zinc-900/40 border border-zinc-800/50 rounded-2xl p-4 text-[11px] text-zinc-400 space-y-2">
-                <span className="font-black text-white block uppercase tracking-wider">Cache Diagnostic Log</span>
+                <span className="font-black text-white block uppercase tracking-wider">Local Data Status</span>
                 <div className="flex justify-between font-mono text-[10px]">
-                  <span>Local SQLite Buffer:</span>
+                  <span>Directory records:</span>
                   <span className="text-emerald-400">1,000 services</span>
                 </div>
                 <div className="flex justify-between font-mono text-[10px]">
-                  <span>Local Persistent storage:</span>
+                  <span>Saved in browser:</span>
                   <span className="text-emerald-400">ACTIVE</span>
                 </div>
                 <div className="flex justify-between font-mono text-[10px]">
-                  <span>Network Sync Status:</span>
-                  <span className="text-zinc-500">PAUSED (Offline focus)</span>
+                  <span>Update mode:</span>
+                  <span className="text-zinc-500">Manual review</span>
                 </div>
+              </div>
+
+              <div className="bg-zinc-900/40 border border-zinc-800/50 rounded-2xl p-4 text-[11px] text-zinc-400 space-y-3">
+                <span className="font-black text-white block uppercase tracking-wider">{ui.accessibility}</span>
+                <button
+                  onClick={() => setIsLargeText(!isLargeText)}
+                  className={`w-full flex items-center justify-between rounded-xl border px-3 py-2 transition ${isLargeText ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-300' : 'bg-zinc-950 border-zinc-800 text-zinc-300'}`}
+                >
+                  <span className="flex items-center gap-2 font-bold"><Type className="w-4 h-4" />{ui.largeText}</span>
+                  <span>{isLargeText ? 'On' : 'Off'}</span>
+                </button>
+                <button
+                  onClick={() => setIsHighContrast(!isHighContrast)}
+                  className={`w-full flex items-center justify-between rounded-xl border px-3 py-2 transition ${isHighContrast ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-300' : 'bg-zinc-950 border-zinc-800 text-zinc-300'}`}
+                >
+                  <span className="flex items-center gap-2 font-bold"><Eye className="w-4 h-4" />{ui.highContrast}</span>
+                  <span>{isHighContrast ? 'On' : 'Off'}</span>
+                </button>
               </div>
 
               {/* Reset State Button */}
@@ -1391,6 +1856,7 @@ function DirectoryApp() {
               >
                 Reset App State
               </button>
+              </div>
 
             </div>
           )}
@@ -1434,14 +1900,14 @@ function DirectoryApp() {
                   animate={{ y: 0 }}
                   exit={{ y: "100%" }}
                   transition={{ type: "spring", damping: 30, stiffness: 400 }}
-                  className="absolute inset-x-0 bottom-0 max-h-[85%] bg-zinc-950 border-t border-zinc-800 rounded-t-[32px] shadow-[0_-12px_42px_rgba(0,0,0,0.85)] z-50 flex flex-col overflow-hidden text-zinc-100 font-sans"
+                  className="absolute inset-x-0 bottom-0 max-h-[85%] md:inset-x-auto md:right-0 md:top-0 md:bottom-0 md:h-full md:w-[min(460px,42vw)] md:max-h-none bg-zinc-950 border-t md:border-t-0 md:border-l border-zinc-800 rounded-t-[32px] md:rounded-none shadow-[0_-12px_42px_rgba(0,0,0,0.85)] md:shadow-[-18px_0_42px_rgba(0,0,0,0.45)] z-50 flex flex-col overflow-hidden text-zinc-100 font-sans"
                 >
                   
                   {/* Pull Handle accent */}
-                  <div className="w-11 h-1 bg-zinc-800 rounded-full mx-auto my-3 shrink-0" />
+                  <div className="w-11 h-1 bg-zinc-800 rounded-full mx-auto my-3 shrink-0 md:hidden" />
 
                   {/* Header Row */}
-                  <div className="px-5 pb-3 border-b border-zinc-900 flex justify-between items-start gap-2 shrink-0">
+                  <div className="px-5 pt-0 md:pt-5 pb-3 border-b border-zinc-900 flex justify-between items-start gap-2 shrink-0">
                     <div className="flex items-start space-x-3 pr-2 min-w-0">
                       <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${getCategoryColor(selectedDetailService.categoryKey)}`}>
                         {getCustomizedIcon(selectedDetailService)}
@@ -1450,7 +1916,7 @@ function DirectoryApp() {
                         <span className="text-[9px] font-black text-emerald-400 uppercase tracking-widest block leading-none mb-1">
                           {getCategoryName(selectedDetailService.categoryKey)}
                         </span>
-                        <h4 className="text-xs sm:text-sm font-black truncate text-white leading-tight">
+                        <h4 className="font-classical text-sm sm:text-base font-black truncate text-white leading-tight">
                           {detailData.title}
                         </h4>
                       </div>
@@ -1468,12 +1934,14 @@ function DirectoryApp() {
 
                   {/* Quick Preview Language Swapper widget (Vernacular helper) */}
                   <div className="bg-zinc-900/60 border-b border-zinc-900 px-5 py-2 shrink-0 flex items-center justify-between gap-2.5 text-[9px] font-bold text-zinc-400 select-none">
-                    <span>Vernacular Swapper:</span>
+                    <span className="font-label">Vernacular Swapper:</span>
                     <div className="flex bg-black/30 p-0.5 rounded border border-zinc-800">
                       {[
                         { code: 'en', flag: '🇬🇧', label: 'EN' },
                         { code: 'ml', flag: '🇮🇳', label: 'മല' },
-                        { code: 'hi', flag: '🇮🇳', label: 'हि' }
+                        { code: 'hi', flag: '🇮🇳', label: 'हि' },
+                        { code: 'te', flag: '🇮🇳', label: 'తె' },
+                        { code: 'kn', flag: '🇮🇳', label: 'ಕ' }
                       ].map((lang) => {
                         const isActive = activeDetailLang === lang.code;
                         return (
@@ -1497,7 +1965,7 @@ function DirectoryApp() {
                   <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4 text-xs leading-relaxed">
                     
                     {/* Primary specs row */}
-                    <div className="grid grid-cols-2 gap-3 bg-zinc-900/40 border border-zinc-900 p-3 rounded-2xl">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 xl:grid-cols-2 gap-3 bg-zinc-900/40 border border-zinc-900 p-3 rounded-2xl">
                       <div>
                         <span className="text-[9px] font-black text-zinc-500 uppercase tracking-wider block mb-0.5">Contact</span>
                         <span className="font-bold text-white block truncate">{detailData.contactName || "Local Volunteer"}</span>
@@ -1506,7 +1974,7 @@ function DirectoryApp() {
                         <span className="text-[9px] font-black text-zinc-500 uppercase tracking-wider block mb-0.5">Hours</span>
                         <span className="font-bold text-white block truncate">{detailData.hours}</span>
                       </div>
-                      <div className="col-span-2 pt-2 border-t border-zinc-900">
+                      <div className="sm:col-span-2 md:col-span-1 xl:col-span-2 pt-2 border-t border-zinc-900">
                         <span className="text-[9px] font-black text-zinc-500 uppercase tracking-wider block mb-0.5">Location</span>
                         <p className="text-[10px] text-zinc-300 leading-tight font-medium">{detailData.location}</p>
                       </div>
@@ -1519,13 +1987,70 @@ function DirectoryApp() {
                     </div>
 
                     {/* Direct Telephone Dialer Dial btn */}
-                    <a
-                      href={`tel:${selectedDetailService.phoneNumber}`}
-                      className="flex items-center justify-center space-x-2 w-full bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-black py-3 px-4 rounded-xl transition uppercase tracking-wider shadow-lg shrink-0 select-none active:scale-95"
-                    >
-                      <Phone className="w-3.5 h-3.5" />
-                      <span>{t.callVolunteerLabel || "Call Volunteer"}</span>
-                    </a>
+                    <div className="space-y-2">
+                      <span className="text-[9px] font-black text-zinc-500 uppercase tracking-wider block">{ui.actions}</span>
+                      <div className="grid grid-cols-2 gap-2">
+                        <a
+                          href={`tel:${selectedDetailService.phoneNumber}`}
+                          className="flex items-center justify-center space-x-2 bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-black py-3 px-4 rounded-xl transition uppercase tracking-wider shadow-lg shrink-0 select-none active:scale-95"
+                        >
+                          <Phone className="w-3.5 h-3.5" />
+                          <span>Call</span>
+                        </a>
+                        <a
+                          href={`https://wa.me/${selectedDetailService.phoneNumber.replace(/\D/g, '')}?text=${encodeURIComponent(getServiceShareText(selectedDetailService))}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="flex items-center justify-center space-x-2 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-zinc-100 text-[11px] font-black py-3 px-4 rounded-xl transition uppercase tracking-wider"
+                        >
+                          <MessageCircle className="w-3.5 h-3.5" />
+                          <span>{ui.whatsapp}</span>
+                        </a>
+                        <button
+                          onClick={() => copyText(selectedDetailService.phoneNumber, 'Phone number copied')}
+                          className="flex items-center justify-center space-x-2 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-zinc-100 text-[11px] font-black py-3 px-4 rounded-xl transition uppercase tracking-wider"
+                        >
+                          <Copy className="w-3.5 h-3.5" />
+                          <span>{ui.copyPhone}</span>
+                        </button>
+                        <button
+                          onClick={() => copyText(getServiceShareText(selectedDetailService), 'Service details copied')}
+                          className="flex items-center justify-center space-x-2 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-zinc-100 text-[11px] font-black py-3 px-4 rounded-xl transition uppercase tracking-wider"
+                        >
+                          <FileText className="w-3.5 h-3.5" />
+                          <span>{ui.copyDetails}</span>
+                        </button>
+                        <button
+                          onClick={() => shareService(selectedDetailService)}
+                          className="flex items-center justify-center space-x-2 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-zinc-100 text-[11px] font-black py-3 px-4 rounded-xl transition uppercase tracking-wider"
+                        >
+                          <Share2 className="w-3.5 h-3.5" />
+                          <span>{ui.share}</span>
+                        </button>
+                      </div>
+                      <button
+                        onClick={() => setReportService(selectedDetailService)}
+                        className="flex items-center justify-center space-x-2 w-full bg-amber-500/10 border border-amber-500/20 hover:bg-amber-500/15 text-amber-300 text-[11px] font-black py-2.5 px-4 rounded-xl transition uppercase tracking-wider"
+                      >
+                        <Flag className="w-3.5 h-3.5" />
+                        <span>{ui.reportWrongInfo}</span>
+                      </button>
+                    </div>
+
+                    <div className="bg-zinc-900/40 border border-zinc-900 p-3 rounded-2xl space-y-2">
+                      <span className="text-[9px] font-black text-zinc-500 uppercase tracking-wider flex items-center gap-1.5">
+                        <ListChecks className="w-3.5 h-3.5 text-emerald-400" />
+                        {ui.documentChecklist}
+                      </span>
+                      <div className="space-y-1.5">
+                        {getDocumentChecklist(selectedDetailService).map((item) => (
+                          <label key={item} className="flex items-start gap-2 text-[10.5px] text-zinc-300 leading-snug">
+                            <input type="checkbox" className="mt-0.5 accent-emerald-500" />
+                            <span>{item}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
 
                     {/* Static Verification Timeline */}
                     <div className="space-y-2 pt-1">
@@ -1554,6 +2079,46 @@ function DirectoryApp() {
           })()}
         </AnimatePresence>
 
+        <AnimatePresence>
+          {reportService && (
+            <>
+              <div className="absolute inset-0 bg-black/70 z-[60] backdrop-blur-xs" onClick={() => setReportService(null)} />
+              <motion.div
+                initial={{ opacity: 0, scale: 0.96, y: 12 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.96, y: 12 }}
+                className="absolute z-[61] left-4 right-4 top-24 md:left-1/2 md:right-auto md:w-[420px] md:-translate-x-1/2 bg-zinc-950 border border-zinc-800 rounded-2xl shadow-2xl p-4 text-zinc-100"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <h3 className="font-classical text-lg font-black text-white">{ui.reportTitle}</h3>
+                    <p className="text-xs text-zinc-400 mt-1">{ui.reportHint}</p>
+                  </div>
+                  <button onClick={() => setReportService(null)} className="p-1.5 bg-zinc-900 border border-zinc-800 rounded-lg text-zinc-400 hover:text-white">
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+                <div className="mt-3 rounded-xl bg-zinc-900/70 border border-zinc-800 p-3 text-xs text-zinc-300">
+                  {reportService.translations[language]?.title || reportService.translations.en.title}
+                </div>
+                <textarea
+                  value={reportText}
+                  onChange={(e) => setReportText(e.target.value)}
+                  placeholder={ui.reportPlaceholder}
+                  className="mt-3 w-full min-h-[110px] bg-zinc-900 border border-zinc-800 text-white rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 resize-none"
+                />
+                <button
+                  onClick={submitReport}
+                  disabled={!reportText.trim()}
+                  className="mt-3 w-full bg-emerald-600 disabled:bg-zinc-800 disabled:text-zinc-500 hover:bg-emerald-700 text-white font-black py-3 rounded-xl text-xs uppercase tracking-wider"
+                >
+                  {ui.submitReport}
+                </button>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
+
         {/* Global Floating Toast for successful directory additions */}
         {successToast && (
           <div className="absolute top-20 inset-x-6 z-50 bg-emerald-600 text-white px-4 py-2.5 rounded-xl shadow-lg text-center text-[10px] font-extrabold uppercase tracking-widest animate-bounce">
@@ -1562,12 +2127,13 @@ function DirectoryApp() {
         )}
 
         {/* Static virtual bottom nav tab row (matching screenshots) */}
-        <div className="absolute bottom-0 inset-x-0 h-16 bg-[#0c0c0e] border-t border-zinc-800/85 flex items-center justify-around z-40 px-3 select-none">
+        <div className="absolute bottom-0 inset-x-0 h-16 bg-[#0c0c0e] border-t border-zinc-800/85 flex items-center justify-around z-40 px-3 md:px-10 select-none">
           {[
-            { id: 'services', label: 'Services', icon: <Building2 className="w-5 h-5" /> },
-            { id: 'map', label: 'Map', icon: <Compass className="w-5 h-5" /> },
-            { id: 'suggest', label: 'Suggest', icon: <Plus className="w-5 h-5" /> },
-            { id: 'profile', label: 'Profile', icon: <User className="w-5 h-5" /> }
+            { id: 'services', label: ui.services, icon: <Building2 className="w-5 h-5" /> },
+            { id: 'emergency', label: ui.emergency, icon: <Siren className="w-5 h-5" /> },
+            { id: 'map', label: ui.map, icon: <Compass className="w-5 h-5" /> },
+            { id: 'suggest', label: ui.suggest, icon: <Plus className="w-5 h-5" /> },
+            { id: 'profile', label: ui.profile, icon: <User className="w-5 h-5" /> }
           ].map((tab) => {
             const isActive = currentTab === tab.id;
             return (
@@ -1581,7 +2147,7 @@ function DirectoryApp() {
                 }`}
               >
                 {tab.icon}
-                <span className="text-[9px] font-extrabold tracking-wider uppercase leading-none">{tab.label}</span>
+                <span className="font-label text-[8px] md:text-[9px] font-extrabold tracking-wider uppercase leading-none">{tab.label}</span>
               </button>
             );
           })}
