@@ -54,6 +54,7 @@ import {
   Filter
 } from "lucide-react";
 import { LanguageProvider, useLanguage } from "./context/LanguageContext";
+import uiBackdrop from "./assets/gramseva-bg.svg";
 import {
   INITIAL_SERVICES,
   KERALA_DISTRICTS,
@@ -842,25 +843,37 @@ Phone: ${service.phoneNumber}`;
     { id: "water connection", label: "Water connection", helper: t.water || "Water" },
     { id: "family health centre", label: "Family Health Centre", helper: t.health || "Health" }
   ];
-  return <div id="dir-app-root" className={`gram-root min-h-screen ${isHighContrast ? "bg-black" : ""} text-slate-900 font-sans antialiased flex flex-col 2xl:flex-row items-stretch 2xl:items-center justify-center p-0 sm:p-6 transition-all duration-300 ${isLargeText ? "text-[110%]" : ""}`}>
+  return <div id="dir-app-root" style={{ "--gram-bg": `url(${uiBackdrop})` }} className={`gram-root min-h-screen ${isHighContrast ? "bg-black" : ""} text-slate-900 font-sans antialiased flex flex-col 2xl:flex-row items-stretch 2xl:items-center justify-center p-0 sm:p-6 transition-all duration-300 ${isLargeText ? "text-[110%]" : ""}`}>
       
       {
     /* Desktop context panel */
   }
-      <div className="context-panel hidden 2xl:flex flex-col max-w-xs mr-6 border border-stone-200/80 p-6 rounded-[28px] space-y-6 shadow-sm animate-soft-rise">
+      <div className="context-panel command-panel hidden 2xl:flex flex-col max-w-xs mr-6 border border-stone-200/80 p-6 rounded-[32px] space-y-6 shadow-sm animate-soft-rise">
         <div className="flex items-center space-x-3">
-          <div className="p-3 bg-emerald-700 text-white rounded-2xl shadow-sm icon-tile">
+          <div className="p-3 bg-emerald-700 text-white rounded-2xl shadow-sm icon-tile animate-float">
             <Languages className="w-6 h-6" />
           </div>
           <div>
-            <h1 className="font-classical text-3xl font-extrabold text-slate-950 tracking-tight">GramSeva</h1>
-            <p className="font-label text-[10px] text-emerald-700 font-bold uppercase tracking-wider">Local service directory</p>
+            <p className="font-label text-[9px] text-amber-700 font-black uppercase tracking-[0.24em]">Civic OS</p>
+            <h1 className="kinetic-title font-classical text-4xl font-extrabold tracking-tight">GramSeva</h1>
+            <p className="font-label text-[10px] text-emerald-700 font-bold uppercase tracking-wider">Verified local directory</p>
           </div>
         </div>
 
-        <p className="text-sm text-slate-600 leading-relaxed">
-          A practical directory for panchayat-level services in Kerala. Residents can search by place, language, category, timings, and verified contact details without digging through scattered sources.
+        <p className="text-sm text-slate-700 leading-relaxed">
+          A cleaner civic dashboard for panchayat-level services. Search contacts, languages, categories, timings, and nearby facilities from one calm, resident-friendly interface.
         </p>
+
+        <div className="grid grid-cols-2 gap-2">
+          <div className="neo-stat">
+            <span>{filteredServices.length}</span>
+            <small>records</small>
+          </div>
+          <div className="neo-stat">
+            <span>{supportedLanguages.length}</span>
+            <small>langs</small>
+          </div>
+        </div>
 
         <div className="space-y-3 pt-2">
           <div className="flex items-center space-x-3 text-xs font-semibold text-slate-700">
@@ -889,7 +902,7 @@ Phone: ${service.phoneNumber}`;
       {
     /* App frame */
   }
-      <div className="directory-frame relative w-full max-w-none lg:max-w-[1180px] 2xl:max-w-[1080px] h-dvh min-h-[620px] sm:h-[calc(100vh-48px)] sm:min-h-[720px] sm:rounded-[32px] sm:border sm:border-stone-300/80 sm:shadow-xl flex flex-col overflow-hidden transition-all animate-soft-rise">
+      <div className="directory-frame relative w-full max-w-none lg:max-w-[1180px] 2xl:max-w-[1080px] h-dvh min-h-[620px] sm:h-[calc(100vh-48px)] sm:min-h-[720px] sm:rounded-[36px] sm:border sm:border-stone-300/80 sm:shadow-xl flex flex-col overflow-hidden transition-all animate-soft-rise">
         
         {
     /* Dynamic Mobile Banner Header block */
@@ -913,7 +926,8 @@ Phone: ${service.phoneNumber}`;
   }
           <div className="flex justify-between items-start gap-2 mt-1">
             <div className="flex-1 min-w-0">
-              <h2 className="font-classical text-2xl lg:text-3xl font-black text-white tracking-tight truncate leading-none drop-shadow-sm">
+              <p className="font-label text-[9px] uppercase tracking-[0.32em] text-amber-100/85 mb-1">GramSeva command grid</p>
+              <h2 className="header-title font-classical text-3xl lg:text-5xl font-black text-white tracking-tight truncate leading-none drop-shadow-sm">
                 {selectedLocality === "all" ? "Manjeshwaram" : selectedLocality} Panchayat
               </h2>
               <p className="text-xs lg:text-sm text-emerald-100/95 font-semibold tracking-wide mt-1">
@@ -941,6 +955,21 @@ Phone: ${service.phoneNumber}`;
                     {lang.label}
                   </button>;
   })}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-3 gap-2 mt-3">
+            <div className="header-metric">
+              <span>{filteredServices.length}</span>
+              <small>services</small>
+            </div>
+            <div className="header-metric">
+              <span>{emergencyServices.length}</span>
+              <small>urgent</small>
+            </div>
+            <div className="header-metric">
+              <span>{supportedLanguages.length}</span>
+              <small>languages</small>
             </div>
           </div>
 
@@ -1010,7 +1039,7 @@ Phone: ${service.phoneNumber}`;
     /* Dynamic scrollable directory area */
   }
               <div className="flex-1 overflow-y-auto px-4 sm:px-5 lg:px-8 pt-3 sm:pt-5 pb-24 scrollbar-none space-y-3 lg:grid lg:grid-cols-2 xl:grid-cols-3 lg:gap-5 lg:space-y-0 lg:items-start">
-                <div className="flex justify-between items-center text-xs font-black tracking-wider text-zinc-500 uppercase px-1 mb-1 lg:col-span-2">
+                <div className="service-feed-heading flex justify-between items-center text-xs font-black tracking-wider text-zinc-500 uppercase px-1 mb-1 lg:col-span-2 xl:col-span-3">
                   <span>Nearby Services</span>
                   <span>{filteredServices.length} listed</span>
                 </div>
@@ -1033,6 +1062,8 @@ Phone: ${service.phoneNumber}`;
       key={service.id}
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
+      whileHover={{ y: -4, scale: 1.01 }}
+      whileTap={{ scale: 0.99 }}
       transition={{ duration: 0.2, delay: Math.min(index * 0.04, 0.2) }}
       onClick={() => setSelectedDetailService(service)}
       className="service-card bg-zinc-900/95 border border-zinc-800/80 rounded-2xl p-4 sm:p-5 min-h-[128px] lg:min-h-[154px] cursor-pointer hover:bg-zinc-800/80 hover:border-zinc-700 transition-all duration-200 flex gap-3 sm:gap-4 shadow-md relative overflow-hidden"

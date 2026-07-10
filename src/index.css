@@ -9,15 +9,15 @@
 }
 
 html {
-  background: #ece7db;
+  background: #111827;
 }
 
 body {
   font-family: var(--font-sans);
   background:
-    linear-gradient(120deg, rgba(15, 118, 110, 0.08), transparent 34%),
-    linear-gradient(240deg, rgba(217, 119, 6, 0.08), transparent 42%),
-    #ece7db;
+    radial-gradient(circle at 16% 16%, rgba(20, 184, 166, 0.22), transparent 28%),
+    radial-gradient(circle at 84% 12%, rgba(245, 158, 11, 0.16), transparent 31%),
+    linear-gradient(135deg, #131b2a 0%, #101827 42%, #1a1712 100%);
 }
 
 button,
@@ -29,11 +29,40 @@ textarea {
 }
 
 .gram-root {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   background:
-    linear-gradient(rgba(31, 41, 55, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(31, 41, 55, 0.035) 1px, transparent 1px),
-    linear-gradient(135deg, #f4efe4 0%, #ebe5d9 50%, #f7f1e8 100%);
-  background-size: 34px 34px, 34px 34px, auto;
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(17, 24, 39, 0.86));
+  background-size: 42px 42px, 42px 42px, auto;
+}
+
+.gram-root::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: var(--gram-bg);
+  background-size: cover;
+  background-position: center;
+  opacity: 0.42;
+  mix-blend-mode: screen;
+  transform: scale(1.04);
+  z-index: -2;
+}
+
+.gram-root::after {
+  content: "";
+  position: absolute;
+  width: 72vw;
+  height: 72vw;
+  left: -22vw;
+  top: -28vw;
+  background: radial-gradient(circle, rgba(20, 184, 166, 0.22), transparent 58%);
+  filter: blur(24px);
+  animation: slow-drift 18s ease-in-out infinite alternate;
+  z-index: -1;
 }
 
 .context-panel,
@@ -48,20 +77,22 @@ textarea {
 
 .context-panel {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(252, 249, 242, 0.94)),
-    radial-gradient(circle at top left, rgba(16, 185, 129, 0.12), transparent 38%);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(236, 253, 245, 0.76)),
+    radial-gradient(circle at top left, rgba(45, 212, 191, 0.22), transparent 38%);
+  backdrop-filter: blur(24px);
 }
 
 .directory-frame {
   background:
-    linear-gradient(180deg, #151516 0%, #101012 100%);
+    linear-gradient(180deg, rgba(10, 14, 22, 0.94) 0%, rgba(6, 9, 15, 0.96) 100%);
 }
 
 .gram-header {
   background:
-    linear-gradient(135deg, rgba(8, 88, 79, 0.98), rgba(13, 148, 136, 0.96) 48%, rgba(7, 95, 71, 0.98)),
+    radial-gradient(circle at 80% 10%, rgba(251, 191, 36, 0.22), transparent 28%),
+    linear-gradient(135deg, rgba(15, 118, 110, 0.98), rgba(20, 184, 166, 0.95) 48%, rgba(5, 46, 22, 0.98)),
     linear-gradient(90deg, rgba(255, 255, 255, 0.09) 1px, transparent 1px);
-  background-size: auto, 22px 22px;
+  background-size: auto, 220% 100%, 22px 22px;
 }
 
 .gram-header::after {
@@ -74,13 +105,13 @@ textarea {
 
 .service-search {
   box-shadow:
-    0 16px 32px rgba(5, 46, 22, 0.2),
+    0 20px 44px rgba(5, 46, 22, 0.28),
     inset 0 1px 0 rgba(255, 255, 255, 0.92);
 }
 
 .category-strip {
   background:
-    linear-gradient(180deg, rgba(31, 31, 35, 0.98), rgba(21, 21, 24, 0.98));
+    linear-gradient(180deg, rgba(17, 24, 39, 0.98), rgba(10, 14, 22, 0.98));
 }
 
 .category-pill {
@@ -107,6 +138,7 @@ textarea {
 .service-card {
   position: relative;
   transform: translateZ(0);
+  backdrop-filter: blur(12px);
 }
 
 .service-card::before {
@@ -115,9 +147,9 @@ textarea {
   inset: 0;
   border-radius: inherit;
   background:
-    linear-gradient(120deg, rgba(255, 255, 255, 0.08), transparent 22%),
-    linear-gradient(90deg, rgba(16, 185, 129, 0.12), transparent 38%);
-  opacity: 0;
+    linear-gradient(120deg, rgba(255, 255, 255, 0.12), transparent 24%),
+    radial-gradient(circle at top right, rgba(20, 184, 166, 0.16), transparent 42%);
+  opacity: 0.22;
   transition: opacity 220ms ease;
   pointer-events: none;
 }
@@ -130,7 +162,7 @@ textarea {
 }
 
 .service-card:hover::before {
-  opacity: 1;
+  opacity: 0.88;
 }
 
 .icon-tile {
@@ -140,9 +172,99 @@ textarea {
 }
 
 .bottom-dock {
-  background: rgba(10, 10, 12, 0.86);
+  background: rgba(5, 8, 13, 0.84);
   backdrop-filter: blur(18px);
   box-shadow: 0 -14px 34px rgba(0, 0, 0, 0.32);
+}
+
+.command-panel {
+  color: #102033;
+}
+
+.kinetic-title,
+.header-title {
+  text-shadow: 0 12px 28px rgba(0, 0, 0, 0.22);
+}
+
+.kinetic-title {
+  background: linear-gradient(100deg, #07111f, #047857 45%, #92400e 72%, #07111f);
+  background-size: 260% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: text-pan 9s ease-in-out infinite;
+}
+
+.header-title {
+  letter-spacing: -0.01em;
+}
+
+.neo-stat {
+  border: 1px solid rgba(15, 118, 110, 0.16);
+  border-radius: 22px;
+  padding: 12px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(240, 253, 250, 0.58));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+}
+
+.neo-stat span,
+.header-metric span {
+  display: block;
+  font-family: var(--font-label);
+  font-weight: 800;
+}
+
+.neo-stat span {
+  color: #064e3b;
+  font-size: 22px;
+}
+
+.neo-stat small,
+.header-metric small {
+  display: block;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.neo-stat small {
+  color: #64748b;
+}
+
+.header-metric {
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 18px;
+  padding: 10px 12px;
+  background: rgba(2, 6, 23, 0.2);
+  backdrop-filter: blur(14px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.header-metric span {
+  color: white;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.header-metric small {
+  color: rgba(209, 250, 229, 0.76);
+  margin-top: 4px;
+}
+
+.service-feed-heading {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  background: linear-gradient(180deg, rgba(10, 14, 22, 0.9), rgba(10, 14, 22, 0.62), transparent);
+  backdrop-filter: blur(10px);
+}
+
+.animate-float {
+  animation: float-loop 4.5s ease-in-out infinite;
 }
 
 .dock-button {
@@ -193,6 +315,35 @@ textarea {
   }
   50% {
     background-position: 100% 50%;
+  }
+}
+
+@keyframes slow-drift {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  to {
+    transform: translate3d(16vw, 8vw, 0) scale(1.08);
+  }
+}
+
+@keyframes text-pan {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes float-loop {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
   }
 }
 
