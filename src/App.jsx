@@ -854,14 +854,14 @@ Phone: ${service.phoneNumber}`;
             <Languages className="w-6 h-6" />
           </div>
           <div>
-            <p className="font-label text-[9px] text-amber-700 font-black uppercase tracking-[0.24em]">Civic OS</p>
-            <h1 className="kinetic-title font-classical text-4xl font-extrabold tracking-tight">GramSeva</h1>
-            <p className="font-label text-[10px] text-emerald-700 font-bold uppercase tracking-wider">Verified local directory</p>
+            <p className="font-label text-[9px] text-signal-orange font-black uppercase tracking-[0.24em]">Civic OS</p>
+            <h1 className="kinetic-title font-classical text-4xl font-normal tracking-tight">GramSeva</h1>
+            <p className="font-label text-[10px] text-ice-white font-bold uppercase tracking-wider">Verified local directory</p>
           </div>
         </div>
 
-        <p className="text-sm text-slate-700 leading-relaxed">
-          A cleaner civic dashboard for panchayat-level services. Search contacts, languages, categories, timings, and nearby facilities from one calm, resident-friendly interface.
+        <p className="observatory-copy text-sm leading-relaxed">
+          A midnight civic observatory for panchayat services. Verified contacts, timings, emergency routes, document checklists, and multilingual records are traced in one searchable grid.
         </p>
 
         <div className="grid grid-cols-2 gap-2">
@@ -926,7 +926,7 @@ Phone: ${service.phoneNumber}`;
   }
           <div className="flex justify-between items-start gap-2 mt-1">
             <div className="flex-1 min-w-0">
-              <p className="font-label text-[9px] uppercase tracking-[0.32em] text-amber-100/85 mb-1">GramSeva command grid</p>
+              <p className="font-label text-[9px] uppercase tracking-[0.32em] text-signal-orange mb-1">GramSeva command grid</p>
               <h2 className="header-title font-classical text-3xl lg:text-5xl font-black text-white tracking-tight truncate leading-none drop-shadow-sm">
                 {selectedLocality === "all" ? "Manjeshwaram" : selectedLocality} Panchayat
               </h2>
