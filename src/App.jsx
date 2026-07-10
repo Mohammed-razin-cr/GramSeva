@@ -843,7 +843,20 @@ Phone: ${service.phoneNumber}`;
     { id: "water connection", label: "Water connection", helper: t.water || "Water" },
     { id: "family health centre", label: "Family Health Centre", helper: t.health || "Health" }
   ];
-  return <div id="dir-app-root" style={{ "--gram-bg": `url(${uiBackdrop})` }} className={`gram-root min-h-screen ${isHighContrast ? "bg-black" : ""} text-slate-900 font-sans antialiased flex flex-col 2xl:flex-row items-stretch 2xl:items-center justify-center p-0 sm:p-6 transition-all duration-300 ${isLargeText ? "text-[110%]" : ""}`}>
+  return <div id="dir-app-root" style={{ "--gram-bg": `url(${uiBackdrop})` }} className={`gram-root observatory-shell min-h-screen ${isHighContrast ? "bg-black" : ""} text-slate-900 font-sans antialiased flex flex-col 2xl:flex-row items-stretch 2xl:items-center justify-center p-0 sm:p-6 transition-all duration-300 ${isLargeText ? "text-[110%]" : ""}`}>
+      <nav className="observatory-nav">
+        <div className="brand-mark">
+          <span className="brand-glyph">GS</span>
+          <span>GramSeva</span>
+        </div>
+        <div className="nav-links">
+          <button onClick={() => setCurrentTab("services")} className={currentTab === "services" ? "active" : ""}>Directory</button>
+          <button onClick={() => setCurrentTab("emergency")} className={currentTab === "emergency" ? "active" : ""}>Emergency</button>
+          <button onClick={() => setCurrentTab("map")} className={currentTab === "map" ? "active" : ""}>Map Grid</button>
+          <button onClick={() => setCurrentTab("suggest")} className={currentTab === "suggest" ? "active" : ""}>Contribute</button>
+        </div>
+        <button onClick={() => setCurrentTab("profile")} className="follow-link">Open Controls</button>
+      </nav>
       
       {
     /* Desktop context panel */
@@ -863,6 +876,13 @@ Phone: ${service.phoneNumber}`;
         <p className="observatory-copy text-sm leading-relaxed">
           A midnight civic observatory for panchayat services. Verified contacts, timings, emergency routes, document checklists, and multilingual records are traced in one searchable grid.
         </p>
+
+        <div className="editorial-signal">
+          <span className="spark-mark">*</span>
+          <p>
+            Local services become <strong>visible</strong> when the data is precise, multilingual, and easy to verify.
+          </p>
+        </div>
 
         <div className="grid grid-cols-2 gap-2">
           <div className="neo-stat">
@@ -896,6 +916,13 @@ Phone: ${service.phoneNumber}`;
 
         <div className="pt-4 border-t border-stone-200 text-[11px] text-slate-500 font-medium leading-relaxed">
           Built as a resident-facing prototype: search the directory, view facilities on the map, add suggestions, and manage local data from the profile tab.
+        </div>
+
+        <div className="signal-stack">
+          <span>THEY</span>
+          <span>HAVE</span>
+          <span>BECOME</span>
+          <span>FINDABLE</span>
         </div>
       </div>
 
@@ -973,6 +1000,12 @@ Phone: ${service.phoneNumber}`;
             </div>
           </div>
 
+          <div className="hero-wireframe">
+            <p>
+              Verified civic records for <span>health</span>, water, schools, revenue offices, agriculture support, and emergency services.
+            </p>
+          </div>
+
           {
     /* Primary search input */
   }
@@ -1038,7 +1071,7 @@ Phone: ${service.phoneNumber}`;
               {
     /* Dynamic scrollable directory area */
   }
-              <div className="flex-1 overflow-y-auto px-4 sm:px-5 lg:px-8 pt-3 sm:pt-5 pb-24 scrollbar-none space-y-3 lg:grid lg:grid-cols-2 xl:grid-cols-3 lg:gap-5 lg:space-y-0 lg:items-start">
+              <div className="service-observatory flex-1 overflow-y-auto px-4 sm:px-5 lg:px-8 pt-3 sm:pt-5 pb-24 scrollbar-none space-y-3 lg:grid lg:grid-cols-2 xl:grid-cols-3 lg:gap-5 lg:space-y-0 lg:items-start">
                 <div className="service-feed-heading flex justify-between items-center text-xs font-black tracking-wider text-zinc-500 uppercase px-1 mb-1 lg:col-span-2 xl:col-span-3">
                   <span>Nearby Services</span>
                   <span>{filteredServices.length} listed</span>
