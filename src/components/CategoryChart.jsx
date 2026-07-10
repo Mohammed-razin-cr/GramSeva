@@ -29,12 +29,12 @@ function CategoryChart({
     };
   });
   const totalCount = services.length;
-  return <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
+  return <div className="chart-surface bg-white/95 rounded-3xl border border-slate-200/80 p-5 shadow-xs">
       <div className="flex items-center justify-between mb-3">
-        <h2 className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+        <h2 className="font-label text-xs font-bold text-slate-500 uppercase tracking-widest">
           {t.metadataLabel || "Service Distribution"}
         </h2>
-        <span className="text-[10px] font-semibold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">
+        <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-full">
           {totalCount} Total
         </span>
       </div>
@@ -56,7 +56,7 @@ function CategoryChart({
     type="category"
     axisLine={false}
     tickLine={false}
-    tick={{ fill: "#475569", fontSize: 11, fontWeight: 500 }}
+    tick={{ fill: "#475569", fontSize: 11, fontWeight: 700, fontFamily: "Plus Jakarta Sans" }}
     width={75}
   />
             <Tooltip
@@ -64,7 +64,7 @@ function CategoryChart({
     content={({ active, payload }) => {
       if (active && payload && payload.length) {
         const item = payload[0].payload;
-        return <div className="bg-slate-900 text-white text-xs px-2.5 py-1.5 rounded-lg shadow-md border border-slate-800">
+        return <div className="bg-slate-950/95 text-white text-xs px-3 py-2 rounded-xl shadow-xl border border-slate-800">
                       <span className="font-bold">{item.name}</span>
                       <span className="block text-[10px] text-slate-350 mt-0.5">
                         {item.count} {item.count === 1 ? "service" : "services"}
@@ -108,7 +108,7 @@ function CategoryChart({
       key={cat.key}
       onClick={() => onSelectCategory(isSelected ? "all" : cat.key)}
       title={`${cat.name}: ${cat.count}`}
-      className="flex flex-col items-center group cursor-pointer focus:outline-hidden"
+      className="flex flex-col items-center group cursor-pointer focus:outline-hidden rounded-xl py-1.5 hover:bg-slate-50 transition"
     >
               <span
       className="w-2.5 h-2.5 rounded-full transition-transform duration-200 group-hover:scale-125"

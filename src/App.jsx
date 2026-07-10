@@ -842,14 +842,14 @@ Phone: ${service.phoneNumber}`;
     { id: "water connection", label: "Water connection", helper: t.water || "Water" },
     { id: "family health centre", label: "Family Health Centre", helper: t.health || "Health" }
   ];
-  return <div id="dir-app-root" className={`min-h-screen ${isHighContrast ? "bg-black" : "bg-[#f4f1e8]"} text-slate-900 font-sans antialiased flex flex-col 2xl:flex-row items-stretch 2xl:items-center justify-center p-0 sm:p-6 transition-all duration-300 ${isLargeText ? "text-[110%]" : ""}`}>
+  return <div id="dir-app-root" className={`gram-root min-h-screen ${isHighContrast ? "bg-black" : ""} text-slate-900 font-sans antialiased flex flex-col 2xl:flex-row items-stretch 2xl:items-center justify-center p-0 sm:p-6 transition-all duration-300 ${isLargeText ? "text-[110%]" : ""}`}>
       
       {
     /* Desktop context panel */
   }
-      <div className="hidden 2xl:flex flex-col max-w-xs mr-6 bg-white border border-stone-200 p-6 rounded-2xl space-y-6 shadow-sm">
+      <div className="context-panel hidden 2xl:flex flex-col max-w-xs mr-6 border border-stone-200/80 p-6 rounded-[28px] space-y-6 shadow-sm animate-soft-rise">
         <div className="flex items-center space-x-3">
-          <div className="p-3 bg-emerald-700 text-white rounded-xl shadow-sm">
+          <div className="p-3 bg-emerald-700 text-white rounded-2xl shadow-sm icon-tile">
             <Languages className="w-6 h-6" />
           </div>
           <div>
@@ -864,19 +864,19 @@ Phone: ${service.phoneNumber}`;
 
         <div className="space-y-3 pt-2">
           <div className="flex items-center space-x-3 text-xs font-semibold text-slate-700">
-            <div className="w-2 h-2 rounded-full bg-emerald-700" />
+            <div className="w-2 h-2 rounded-full bg-emerald-700 shadow-[0_0_0_4px_rgba(16,185,129,0.12)]" />
             <span>Kozhikode and Mukkali data ready on launch</span>
           </div>
           <div className="flex items-center space-x-3 text-xs font-semibold text-slate-700">
-            <div className="w-2 h-2 rounded-full bg-emerald-700" />
+            <div className="w-2 h-2 rounded-full bg-emerald-700 shadow-[0_0_0_4px_rgba(16,185,129,0.12)]" />
             <span>Map view for nearby public facilities</span>
           </div>
           <div className="flex items-center space-x-3 text-xs font-semibold text-slate-700">
-            <div className="w-2 h-2 rounded-full bg-emerald-700" />
+            <div className="w-2 h-2 rounded-full bg-emerald-700 shadow-[0_0_0_4px_rgba(16,185,129,0.12)]" />
             <span>English, Malayalam, Hindi, and Telugu content</span>
           </div>
           <div className="flex items-center space-x-3 text-xs font-semibold text-slate-700">
-            <div className="w-2 h-2 rounded-full bg-emerald-700" />
+            <div className="w-2 h-2 rounded-full bg-emerald-700 shadow-[0_0_0_4px_rgba(16,185,129,0.12)]" />
             <span>Local storage keeps added services available</span>
           </div>
         </div>
@@ -889,12 +889,12 @@ Phone: ${service.phoneNumber}`;
       {
     /* App frame */
   }
-      <div className="relative w-full max-w-none lg:max-w-[1180px] 2xl:max-w-[1080px] h-dvh min-h-[620px] sm:h-[calc(100vh-48px)] sm:min-h-[720px] bg-[#121214] sm:rounded-3xl sm:border sm:border-stone-300 sm:shadow-xl flex flex-col overflow-hidden transition-all">
+      <div className="directory-frame relative w-full max-w-none lg:max-w-[1180px] 2xl:max-w-[1080px] h-dvh min-h-[620px] sm:h-[calc(100vh-48px)] sm:min-h-[720px] sm:rounded-[32px] sm:border sm:border-stone-300/80 sm:shadow-xl flex flex-col overflow-hidden transition-all animate-soft-rise">
         
         {
     /* Dynamic Mobile Banner Header block */
   }
-        <div className="bg-gradient-to-br from-[#0c594d] via-[#0d9488] to-[#047857] text-white p-4 sm:p-5 lg:p-6 pt-8 sm:pt-6 pb-5 shrink-0 flex flex-col gap-2 relative shadow-lg">
+        <div className="gram-header text-white p-4 sm:p-5 lg:p-6 pt-8 sm:pt-6 pb-5 shrink-0 flex flex-col gap-2 relative shadow-lg animate-sheen">
           
           {
     /* Virtual OS Status Bar */
@@ -902,7 +902,7 @@ Phone: ${service.phoneNumber}`;
           <div className="h-6 flex justify-between items-center text-[12px] text-white/95 font-semibold px-1 mb-1">
             <span>9:41</span>
             <span className="font-label text-[10px] font-extrabold tracking-widest text-emerald-100 uppercase">GramSeva</span>
-            <div className={`flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-[9px] font-bold border transition-colors ${isOfflineMode ? "bg-amber-500/20 text-amber-300 border-amber-500/30" : "bg-emerald-500/20 text-emerald-300 border-emerald-500/30"}`}>
+            <div className={`flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-[9px] font-bold border backdrop-blur-sm transition-colors ${isOfflineMode ? "bg-amber-500/20 text-amber-300 border-amber-500/30" : "bg-emerald-500/20 text-emerald-200 border-emerald-300/30"}`}>
               <span className={`w-1.5 h-1.5 rounded-full ${isOfflineMode ? "bg-amber-400" : "bg-emerald-400 animate-pulse"}`} />
               <span className="font-label">Offline Ready</span>
             </div>
@@ -913,7 +913,7 @@ Phone: ${service.phoneNumber}`;
   }
           <div className="flex justify-between items-start gap-2 mt-1">
             <div className="flex-1 min-w-0">
-              <h2 className="font-classical text-2xl lg:text-3xl font-black text-white tracking-tight truncate leading-none">
+              <h2 className="font-classical text-2xl lg:text-3xl font-black text-white tracking-tight truncate leading-none drop-shadow-sm">
                 {selectedLocality === "all" ? "Manjeshwaram" : selectedLocality} Panchayat
               </h2>
               <p className="text-xs lg:text-sm text-emerald-100/95 font-semibold tracking-wide mt-1">
@@ -924,7 +924,7 @@ Phone: ${service.phoneNumber}`;
             {
     /* Quick Vernacular Lang Buttons (Capsule style matching mockup) */
   }
-            <div className="flex bg-black/20 p-0.5 rounded-lg border border-white/10 shrink-0">
+            <div className="flex bg-black/20 p-0.5 rounded-xl border border-white/15 shrink-0 shadow-inner backdrop-blur-sm">
               {[
     { code: "en", label: "EN" },
     { code: "ml", label: "\u0D2E\u0D32" },
@@ -936,7 +936,7 @@ Phone: ${service.phoneNumber}`;
     return <button
       key={lang.code}
       onClick={() => setLanguage(lang.code)}
-      className={`px-2 py-0.5 rounded text-[10px] font-extrabold tracking-tight transition ${isActive ? "bg-white text-emerald-900 shadow-xs" : "text-white/85 hover:bg-white/10"}`}
+      className={`px-2 py-0.5 rounded-lg text-[10px] font-extrabold tracking-tight transition active:scale-95 ${isActive ? "bg-white text-emerald-900 shadow-xs" : "text-white/85 hover:bg-white/10"}`}
     >
                     {lang.label}
                   </button>;
@@ -948,7 +948,7 @@ Phone: ${service.phoneNumber}`;
     /* Primary search input */
   }
           <div className="relative md:max-w-3xl">
-            <div className="bg-white rounded-2xl p-1 shadow-md flex items-center mt-3 border border-slate-100">
+            <div className="service-search bg-white rounded-2xl p-1.5 shadow-md flex items-center mt-3 border border-slate-100">
               <Search className="w-4 h-4 text-slate-400 ml-3 shrink-0" />
               <input
     type="text"
@@ -957,7 +957,7 @@ Phone: ${service.phoneNumber}`;
     onFocus={() => setIsSearchFocused(true)}
     onBlur={() => setTimeout(() => setIsSearchFocused(false), 140)}
     onChange={(e) => setSearchQuery(e.target.value)}
-    className="w-full text-slate-800 placeholder-slate-400 bg-transparent text-xs py-1.5 px-2.5 outline-none border-none leading-none font-medium"
+    className="w-full text-slate-800 placeholder-slate-400 bg-transparent text-sm py-2 px-2.5 outline-none border-none leading-none font-semibold"
   />
               {searchQuery ? <button onClick={() => setSearchQuery("")} className="p-1 text-slate-400 hover:text-slate-600 mr-2" aria-label="Clear search">
                   <X className="w-3.5 h-3.5" />
@@ -965,7 +965,7 @@ Phone: ${service.phoneNumber}`;
                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
                 </span>}
             </div>
-            {isSearchFocused && searchSuggestions.length > 0 && <div className="absolute top-full mt-2 left-0 right-0 z-40 bg-white text-slate-900 border border-slate-200 rounded-2xl shadow-xl p-2">
+            {isSearchFocused && searchSuggestions.length > 0 && <div className="absolute top-full mt-2 left-0 right-0 z-40 bg-white/95 backdrop-blur-xl text-slate-900 border border-slate-200 rounded-2xl shadow-xl p-2 animate-soft-rise">
                 <div className="px-2 pb-1 text-[10px] font-black uppercase tracking-wider text-slate-400">{ui.searchSuggestions}</div>
                 {searchSuggestions.map((item) => <button
     key={item.id}
@@ -992,13 +992,13 @@ Phone: ${service.phoneNumber}`;
               {
     /* Category Horizontal Filter Row */
   }
-              <div className="flex overflow-x-auto gap-2 px-4 sm:px-5 lg:px-6 py-3 bg-[#18181b] border-b border-zinc-800/80 scrollbar-none shrink-0 select-none">
+              <div className="category-strip flex overflow-x-auto gap-2 px-4 sm:px-5 lg:px-6 py-3 border-b border-zinc-800/80 scrollbar-none shrink-0 select-none">
                 {categoryOptions.map((cat) => {
     const isActive = selectedCategory === cat.key;
     return <button
       key={cat.key}
       onClick={() => setSelectedCategory(cat.key)}
-      className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition whitespace-nowrap border shrink-0 ${isActive ? "bg-zinc-800 text-white border-zinc-700 shadow-sm" : "bg-transparent text-zinc-400 border-zinc-800/60 hover:text-white hover:border-zinc-700"}`}
+      className={`category-pill ${isActive ? "is-active" : ""} flex items-center space-x-1.5 px-3.5 py-2 rounded-full text-xs font-bold transition whitespace-nowrap border shrink-0 active:scale-95 ${isActive ? "bg-zinc-800 text-white border-emerald-500/30 shadow-sm" : "bg-transparent text-zinc-400 border-zinc-800/60 hover:text-white hover:border-zinc-700"}`}
     >
                       {cat.icon}
                 <span className="font-label text-[11px]">{cat.label}</span>
@@ -1009,7 +1009,7 @@ Phone: ${service.phoneNumber}`;
               {
     /* Dynamic scrollable directory area */
   }
-              <div className="flex-1 overflow-y-auto px-4 sm:px-5 lg:px-8 pt-3 sm:pt-5 pb-24 scrollbar-none space-y-3 lg:grid lg:grid-cols-2 lg:gap-5 lg:space-y-0 lg:items-start">
+              <div className="flex-1 overflow-y-auto px-4 sm:px-5 lg:px-8 pt-3 sm:pt-5 pb-24 scrollbar-none space-y-3 lg:grid lg:grid-cols-2 xl:grid-cols-3 lg:gap-5 lg:space-y-0 lg:items-start">
                 <div className="flex justify-between items-center text-xs font-black tracking-wider text-zinc-500 uppercase px-1 mb-1 lg:col-span-2">
                   <span>Nearby Services</span>
                   <span>{filteredServices.length} listed</span>
@@ -1035,7 +1035,7 @@ Phone: ${service.phoneNumber}`;
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2, delay: Math.min(index * 0.04, 0.2) }}
       onClick={() => setSelectedDetailService(service)}
-      className="bg-zinc-900/95 border border-zinc-800/80 rounded-2xl p-4 sm:p-5 min-h-[128px] lg:min-h-[154px] cursor-pointer hover:bg-zinc-850 hover:border-zinc-700 transition flex gap-3 sm:gap-4 shadow-md relative overflow-hidden"
+      className="service-card bg-zinc-900/95 border border-zinc-800/80 rounded-2xl p-4 sm:p-5 min-h-[128px] lg:min-h-[154px] cursor-pointer hover:bg-zinc-800/80 hover:border-zinc-700 transition-all duration-200 flex gap-3 sm:gap-4 shadow-md relative overflow-hidden"
     >
                           {
       /* Emergency Stripe */
@@ -1045,7 +1045,7 @@ Phone: ${service.phoneNumber}`;
                           {
       /* Customized icon wrapper on left */
     }
-                          <div className={`w-12 h-12 lg:w-13 lg:h-13 rounded-xl flex items-center justify-center shrink-0 ${getCategoryColor(service.categoryKey)}`}>
+                          <div className={`icon-tile w-12 h-12 lg:w-13 lg:h-13 rounded-2xl flex items-center justify-center shrink-0 ${getCategoryColor(service.categoryKey)}`}>
                             {getCustomizedIcon(service)}
                           </div>
 
@@ -1113,7 +1113,7 @@ Phone: ${service.phoneNumber}`;
                 {filteredServices.length > visibleCount && <div className="pt-2 pb-4 text-center lg:col-span-2">
                     <button
     onClick={() => setVisibleCount((p) => p + 100)}
-    className="w-full py-3 bg-zinc-900 border border-zinc-800 hover:bg-zinc-850 text-emerald-400 font-extrabold text-xs uppercase tracking-widest rounded-2xl transition shadow-md active:scale-98"
+    className="w-full py-3 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800/80 text-emerald-400 font-extrabold text-xs uppercase tracking-widest rounded-2xl transition shadow-md active:scale-98"
   >
                       Load More (+100)
                     </button>
@@ -2028,7 +2028,7 @@ Phone: ${service.phoneNumber}`;
         {
     /* Static virtual bottom nav tab row (matching screenshots) */
   }
-        <div className="absolute bottom-0 inset-x-0 h-16 bg-[#0c0c0e] border-t border-zinc-800/85 flex items-center justify-around z-40 px-3 md:px-10 select-none">
+        <div className="bottom-dock absolute bottom-0 inset-x-0 h-16 border-t border-zinc-800/85 flex items-center justify-around z-40 px-3 md:px-10 select-none">
           {[
     { id: "services", label: ui.services, icon: <Building2 className="w-5 h-5" /> },
     { id: "emergency", label: ui.emergency, icon: <Siren className="w-5 h-5" /> },
@@ -2040,7 +2040,7 @@ Phone: ${service.phoneNumber}`;
     return <button
       key={tab.id}
       onClick={() => setCurrentTab(tab.id)}
-      className={`flex flex-col items-center justify-center gap-1 flex-1 py-1 transition cursor-pointer select-none active:scale-95 ${isActive ? "text-emerald-500 font-bold" : "text-zinc-500 hover:text-zinc-300"}`}
+      className={`dock-button ${isActive ? "is-active" : ""} flex flex-col items-center justify-center gap-1 flex-1 py-1 transition cursor-pointer select-none active:scale-95 ${isActive ? "text-emerald-400 font-bold" : "text-zinc-500 hover:text-zinc-300"}`}
     >
                 {tab.icon}
                 <span className="font-label text-[8px] md:text-[9px] font-extrabold tracking-wider uppercase leading-none">{tab.label}</span>
