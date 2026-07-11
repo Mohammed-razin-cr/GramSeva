@@ -1,20 +1,49 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+# GramSeva
 
-# Run and deploy your AI Studio app
+GramSeva is a local civic-service directory for Kerala communities. It helps residents find nearby public services, verified contacts, working hours, locations, emergency support, and volunteer-updated records in multiple languages.
 
-This contains everything you need to run your app locally.
+## What It Does
 
-View your app in AI Studio: https://ai.studio/apps/3abcf3bf-e44e-47e2-b051-40ecb1fd58fb
+- Search services by name, category, location, contact, or phone number.
+- Filter by Kerala district and locality, with Kozhikode and Mukkali ready by default.
+- View service details, verification history, guidelines, and map context.
+- Add community suggestions that are saved locally in the browser.
+- Switch between English, Malayalam, Hindi, and Telugu.
+- Use an offline-ready mode backed by local browser storage.
+
+## Tech Stack
+
+- React 19
+- TypeScript
+- Vite
+- Tailwind CSS
+- Recharts
+- Lucide React icons
 
 ## Run Locally
 
-**Prerequisites:**  Node.js
+Prerequisite: Node.js 18 or newer.
 
+```bash
+npm install
+npm run dev
+```
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+Open `http://localhost:3000` in your browser.
+
+## Useful Scripts
+
+```bash
+npm run dev      # Start the local Vite server
+npm run build    # Create a production build
+npm run preview  # Preview the production build
+npm run lint     # Run TypeScript checks
+```
+
+## Environment
+
+The app can run with local data without an API key. If you add Gemini-powered features later, copy `.env.example` to `.env.local` and set:
+
+```bash
+GEMINI_API_KEY=your_api_key_here
+```
