@@ -817,13 +817,12 @@ textarea {
 }
 
 .service-feed-heading {
-  position: sticky;
-  top: 0;
-  z-index: 5;
+  position: static;
+  z-index: auto;
   padding-top: 4px;
   padding-bottom: 4px;
-  background: linear-gradient(180deg, rgba(10, 14, 22, 0.9), rgba(10, 14, 22, 0.62), transparent);
-  backdrop-filter: blur(10px);
+  background: transparent;
+  backdrop-filter: none;
 }
 
 .animate-float {
