@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "motion/react";
+import { lazy, Suspense, useState, useEffect } from "react";
+import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import {
   Phone,
   MapPin,
@@ -60,8 +60,54 @@ import {
   KERALA_DISTRICTS,
   LOCALITIES_EN
 } from "./data/services";
+
+const ServiceMap = lazy(() => import("./components/ServiceMap.jsx"));
+
+const CATEGORY_ALIASES = {
+  health: ["hospital", "clinic", "doctor", "medical", "ambulance", "phc", "fhc", "health centre", "arogya", "ആരോഗ്യം", "ആശുപത്രി", "ಆರೋಗ್ಯ", "ಆಸ್ಪತ್ರೆ", "स्वास्थ्य", "अस्पताल", "వైద్యం", "ఆసుపత్రి"],
+  water: ["water", "kwa", "jal", "pipe", "connection", "drinking water", "tank", "borewell", "vellam", "വെള്ളം", "ജലം", "ನೀರು", "ಜಲ", "पानी", "जल", "నీరు", "జలం"],
+  agriculture: ["krishi", "farm", "farmer", "seed", "soil", "fertilizer", "agriculture", "kisan", "കൃഷി", "കർഷകൻ", "ಕೃಷಿ", "ರೈತ", "कृषि", "किसान", "వ్యవసాయం", "రైతు"],
+  education: ["school", "college", "teacher", "education", "class", "student", "library", "വിദ്യാഭ്യാസം", "സ്കൂൾ", "ಶಾಲೆ", "ಶಿಕ್ಷಣ", "स्कूल", "शिक्षा", "పాఠశాల", "విద్య"],
+  government: ["panchayat", "village", "revenue", "registry", "akshaya", "certificate", "office", "ration", "tax", "പഞ്ചായത്ത്", "വില്ലേജ്", "കച്ചേരി", "ಪಂಚಾಯತ್", "ಕಚೇರಿ", "सरकार", "पंचायत", "प्रमाणपत्र", "ప్రభుత్వం", "పంచాయతీ"]
+};
+
+function normalizeSearchText(value = "") {
+  return String(value)
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^\p{L}\p{N}\s]/gu, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function levenshteinDistance(a, b) {
+  if (a === b) return 0;
+  if (!a.length) return b.length;
+  if (!b.length) return a.length;
+
+  const previous = Array.from({ length: b.length + 1 }, (_, index) => index);
+  const current = Array.from({ length: b.length + 1 }, () => 0);
+
+  for (let i = 1; i <= a.length; i += 1) {
+    current[0] = i;
+    for (let j = 1; j <= b.length; j += 1) {
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      current[j] = Math.min(current[j - 1] + 1, previous[j] + 1, previous[j - 1] + cost);
+    }
+    previous.splice(0, previous.length, ...current);
+  }
+
+  return previous[b.length];
+}
+
+function getDuplicateKey(service) {
+  const data = service.translations?.en || Object.values(service.translations || {})[0] || {};
+  return normalizeSearchText(`${data.title || ""} ${service.localityName || ""} ${service.districtName || ""}`);
+}
 function DirectoryApp() {
   const { language, setLanguage, t, supportedLanguages } = useLanguage();
+  const shouldReduceMotion = useReducedMotion();
   const locStrings = {
     en: {
       locationHubTitle: "Location Filter Hub",
@@ -318,6 +364,93 @@ function DirectoryApp() {
       const baseDist = distMapping[service.districtName || ""] || 160;
       return Math.round((baseDist + noise * 12) * 10) / 10;
     }
+  };
+  const getServiceSearchText = (service) => {
+    const translationText = Object.values(service.translations || {})
+      .flatMap((entry) => [
+        entry.title,
+        entry.description,
+        entry.category,
+        entry.location,
+        entry.hours,
+        entry.contactName,
+        ...(entry.history || []),
+        ...(entry.extraNotes || [])
+      ])
+      .filter(Boolean);
+
+    return normalizeSearchText([
+      ...translationText,
+      service.categoryKey,
+      service.districtName,
+      service.localityName,
+      service.phoneNumber,
+      ...(CATEGORY_ALIASES[service.categoryKey] || [])
+    ].join(" "));
+  };
+  const getSearchScore = (service, query) => {
+    const normalizedQuery = normalizeSearchText(query);
+    if (!normalizedQuery) return 0;
+
+    const haystack = getServiceSearchText(service);
+    if (haystack.includes(normalizedQuery)) return 120 + normalizedQuery.length;
+
+    const queryTokens = normalizedQuery.split(" ").filter(Boolean);
+    const haystackTokens = haystack.split(" ").filter(Boolean);
+    let score = 0;
+
+    queryTokens.forEach((queryToken) => {
+      if (haystackTokens.some((token) => token === queryToken)) {
+        score += 32;
+        return;
+      }
+      if (haystackTokens.some((token) => token.startsWith(queryToken) || token.includes(queryToken))) {
+        score += 20;
+        return;
+      }
+      const typoMatch = haystackTokens.some((token) => {
+        if (queryToken.length < 4 || token.length < 4) return false;
+        const maxDistance = queryToken.length > 7 ? 2 : 1;
+        return levenshteinDistance(queryToken, token) <= maxDistance;
+      });
+      if (typoMatch) score += 14;
+    });
+
+    return score;
+  };
+  const getVerificationAgeDays = (service) => {
+    if (!service.lastVerified) return 999;
+    const verifiedDate = new Date(service.lastVerified);
+    if (Number.isNaN(verifiedDate.getTime())) return 999;
+    return Math.max(0, Math.floor((Date.now() - verifiedDate.getTime()) / 86400000));
+  };
+  const getDuplicateCount = (service, counts) => counts[getDuplicateKey(service)] || 0;
+  const getVerificationScore = (service, counts) => {
+    const data = service.translations.en || Object.values(service.translations || {})[0] || {};
+    let score = 40;
+    if (service.phoneNumber) score += 12;
+    if (data.location) score += 10;
+    if (data.hours) score += 10;
+    if (data.contactName) score += 8;
+    if (Object.keys(service.translations || {}).length >= 4) score += 8;
+    if (getVerificationAgeDays(service) <= 30) score += 12;
+    if (getDuplicateCount(service, counts) > 1) score -= 15;
+    return Math.max(35, Math.min(100, score));
+  };
+  const getConfidenceLevel = (score) => {
+    if (score >= 86) return "High confidence";
+    if (score >= 68) return "Needs routine check";
+    return "Verify before visiting";
+  };
+  const getLastCheckedBy = (service) => {
+    const checkerByCategory = {
+      health: "Health volunteer desk",
+      water: "Ward water committee",
+      agriculture: "Krishi help desk",
+      education: "School liaison desk",
+      government: "Panchayat registry desk"
+    };
+    return checkerByCategory[service.categoryKey] || "Local volunteer desk";
   };
   const [services, setServices] = useState([]);
   const [selectedDetailService, setSelectedDetailService] = useState(null);
@@ -795,45 +928,33 @@ Phone: ${service.phoneNumber}`;
     }
     return ["Aadhaar card", "Address proof", "Phone number", "Relevant application or receipt"];
   };
-  const baseFilteredServices = services.filter((service) => {
-    if (selectedCategory !== "all" && service.categoryKey !== selectedCategory) {
-      if (selectedCategory === "agriculture" && service.translations.en.category.toLowerCase() === "ration") {
-      } else {
-        return false;
+  const duplicateCounts = services.reduce((acc, service) => {
+    const key = getDuplicateKey(service);
+    acc[key] = (acc[key] || 0) + 1;
+    return acc;
+  }, {});
+  const normalizedSearchQuery = normalizeSearchText(searchQuery);
+  const filteredServices = services
+    .map((service) => ({ service, searchScore: getSearchScore(service, normalizedSearchQuery) }))
+    .filter(({ service, searchScore }) => {
+      if (selectedCategory !== "all" && service.categoryKey !== selectedCategory) {
+        if (selectedCategory === "agriculture" && service.translations.en.category.toLowerCase() === "ration") {
+        } else {
+          return false;
+        }
       }
-    }
-    if (selectedDistrict !== "all" && service.districtName !== selectedDistrict) {
-      return false;
-    }
-    if (selectedLocality !== "all" && service.localityName !== selectedLocality) {
-      return false;
-    }
-    if (isNearMeActive) {
-      const dist = getSimulatedDistance(service);
-      if (dist > nearMeDistance) {
-        return false;
-      }
-    }
-    if (!searchQuery.trim()) return true;
-    const normQuery = searchQuery.toLowerCase();
-    const trans = service.translations[language] || service.translations["en"];
-    const titleMatch = trans.title.toLowerCase().includes(normQuery);
-    const descMatch = trans.description.toLowerCase().includes(normQuery);
-    const locMatch = trans.location.toLowerCase().includes(normQuery);
-    const contactMatch = trans.contactName.toLowerCase().includes(normQuery);
-    const categoryMatch = trans.category.toLowerCase().includes(normQuery);
-    const phoneMatch = service.phoneNumber.includes(normQuery);
-    const transEn = service.translations["en"];
-    const titleEnMatch = transEn.title.toLowerCase().includes(normQuery);
-    const descEnMatch = transEn.description.toLowerCase().includes(normQuery);
-    return titleMatch || descMatch || locMatch || contactMatch || categoryMatch || phoneMatch || titleEnMatch || descEnMatch;
-  });
-  const filteredServices = [...baseFilteredServices];
-  if (isNearMeActive || sortByProximity) {
-    filteredServices.sort((a, b) => getSimulatedDistance(a) - getSimulatedDistance(b));
-  }
+      if (selectedDistrict !== "all" && service.districtName !== selectedDistrict) return false;
+      if (selectedLocality !== "all" && service.localityName !== selectedLocality) return false;
+      if (isNearMeActive && getSimulatedDistance(service) > nearMeDistance) return false;
+      return !normalizedSearchQuery || searchScore > 0;
+    })
+    .sort((a, b) => {
+      if (normalizedSearchQuery && b.searchScore !== a.searchScore) return b.searchScore - a.searchScore;
+      if (isNearMeActive || sortByProximity) return getSimulatedDistance(a.service) - getSimulatedDistance(b.service);
+      return 0;
+    })
+    .map(({ service }) => service);
   const emergencyServices = filteredServices.filter((service) => service.isEmergency || service.categoryKey === "health" || /police|ambulance|hospital|fire|emergency|helpline/i.test(service.translations.en.title)).slice(0, 24);
-  const mapServices = filteredServices.filter((service) => mapCategoryFilter === "all" || service.categoryKey === mapCategoryFilter);
   const searchSuggestions = searchQuery.trim().length > 0 ? filteredServices.slice(0, 5).map((service) => {
     const data = service.translations[language] || service.translations.en;
     return { id: service.id, label: data.title, helper: data.category };
@@ -843,17 +964,18 @@ Phone: ${service.phoneNumber}`;
     { id: "water connection", label: "Water connection", helper: t.water || "Water" },
     { id: "family health centre", label: "Family Health Centre", helper: t.health || "Health" }
   ];
-  return <div id="dir-app-root" style={{ "--gram-bg": `url(${uiBackdrop})` }} className={`gram-root observatory-shell min-h-screen ${isHighContrast ? "bg-black" : ""} text-slate-900 font-sans antialiased flex flex-col 2xl:flex-row items-stretch 2xl:items-center justify-center p-0 sm:p-6 transition-all duration-300 ${isLargeText ? "text-[110%]" : ""}`}>
-      <nav className="observatory-nav">
+  return <div id="dir-app-root" style={{ "--gram-bg": `url(${uiBackdrop})` }} className={`gram-root observatory-shell min-h-screen ${isHighContrast ? "bg-black high-contrast" : ""} text-slate-900 font-sans antialiased flex flex-col 2xl:flex-row items-stretch 2xl:items-center justify-center p-0 sm:p-6 transition-all duration-300 ${isLargeText ? "text-[110%]" : ""}`}>
+      <a href="#service-results" className="skip-link">Skip to service results</a>
+      <nav className="observatory-nav" aria-label="Primary navigation">
         <div className="brand-mark">
           <span className="brand-glyph">GS</span>
           <span>GramSeva</span>
         </div>
-        <div className="nav-links">
-          <button onClick={() => setCurrentTab("services")} className={currentTab === "services" ? "active" : ""}>Directory</button>
-          <button onClick={() => setCurrentTab("emergency")} className={currentTab === "emergency" ? "active" : ""}>Emergency</button>
-          <button onClick={() => setCurrentTab("map")} className={currentTab === "map" ? "active" : ""}>Map Grid</button>
-          <button onClick={() => setCurrentTab("suggest")} className={currentTab === "suggest" ? "active" : ""}>Contribute</button>
+        <div className="nav-links" role="tablist" aria-label="Directory sections">
+          <button onClick={() => setCurrentTab("services")} className={currentTab === "services" ? "active" : ""} role="tab" aria-selected={currentTab === "services"}>Directory</button>
+          <button onClick={() => setCurrentTab("emergency")} className={currentTab === "emergency" ? "active" : ""} role="tab" aria-selected={currentTab === "emergency"}>Emergency</button>
+          <button onClick={() => setCurrentTab("map")} className={currentTab === "map" ? "active" : ""} role="tab" aria-selected={currentTab === "map"}>Map Grid</button>
+          <button onClick={() => setCurrentTab("suggest")} className={currentTab === "suggest" ? "active" : ""} role="tab" aria-selected={currentTab === "suggest"}>Contribute</button>
         </div>
         <button onClick={() => setCurrentTab("profile")} className="follow-link">Open Controls</button>
       </nav>
@@ -1014,6 +1136,7 @@ Phone: ${service.phoneNumber}`;
               <Search className="w-4 h-4 text-slate-400 ml-3 shrink-0" />
               <input
     type="text"
+    aria-label="Search services by name, category, place, contact, or language"
     placeholder={t.searchPlaceholder || "Search services..."}
     value={searchQuery}
     onFocus={() => setIsSearchFocused(true)}
@@ -1054,12 +1177,14 @@ Phone: ${service.phoneNumber}`;
               {
     /* Category Horizontal Filter Row */
   }
-              <div className="category-strip flex overflow-x-auto gap-2 px-4 sm:px-5 lg:px-6 py-3 border-b border-zinc-800/80 scrollbar-none shrink-0 select-none">
+              <div className="category-strip flex overflow-x-auto gap-2 px-4 sm:px-5 lg:px-6 py-3 border-b border-zinc-800/80 scrollbar-none shrink-0 select-none" role="toolbar" aria-label="Filter services by category">
                 {categoryOptions.map((cat) => {
     const isActive = selectedCategory === cat.key;
     return <button
       key={cat.key}
       onClick={() => setSelectedCategory(cat.key)}
+      aria-pressed={isActive}
+      aria-label={`Show ${cat.label} services`}
       className={`category-pill ${isActive ? "is-active" : ""} flex items-center space-x-1.5 px-3.5 py-2 rounded-full text-xs font-bold transition whitespace-nowrap border shrink-0 active:scale-95 ${isActive ? "bg-zinc-800 text-white border-emerald-500/30 shadow-sm" : "bg-transparent text-zinc-400 border-zinc-800/60 hover:text-white hover:border-zinc-700"}`}
     >
                       {cat.icon}
@@ -1071,7 +1196,7 @@ Phone: ${service.phoneNumber}`;
               {
     /* Dynamic scrollable directory area */
   }
-              <div className="service-observatory flex-1 overflow-y-auto px-4 sm:px-5 lg:px-8 pt-3 sm:pt-5 pb-24 scrollbar-none space-y-3 lg:grid lg:grid-cols-2 lg:gap-5 lg:space-y-0 lg:items-start">
+              <div id="service-results" className="service-observatory flex-1 overflow-y-auto px-4 sm:px-5 lg:px-8 pt-3 sm:pt-5 pb-24 scrollbar-none space-y-3 lg:grid lg:grid-cols-2 lg:gap-5 lg:space-y-0 lg:items-start" tabIndex={-1}>
                 <div className="service-feed-heading flex justify-between items-center text-xs font-black tracking-wider text-zinc-500 uppercase px-1 mb-1 lg:col-span-2">
                   <span>Nearby Services</span>
                   <span>{filteredServices.length} listed</span>
@@ -1091,14 +1216,25 @@ Phone: ${service.phoneNumber}`;
         return false;
       }
     })();
+    const verificationScore = getVerificationScore(service, duplicateCounts);
+    const duplicateCount = getDuplicateCount(service, duplicateCounts);
     return <motion.div
       key={service.id}
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -4, scale: 1.01 }}
-      whileTap={{ scale: 0.99 }}
-      transition={{ duration: 0.2, delay: Math.min(index * 0.04, 0.2) }}
+      initial={shouldReduceMotion ? false : { opacity: 0, y: 8 }}
+      animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
+      whileHover={shouldReduceMotion ? undefined : { y: -4, scale: 1.01 }}
+      whileTap={shouldReduceMotion ? undefined : { scale: 0.99 }}
+      transition={{ duration: shouldReduceMotion ? 0 : 0.2, delay: shouldReduceMotion ? 0 : Math.min(index * 0.04, 0.2) }}
       onClick={() => setSelectedDetailService(service)}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          setSelectedDetailService(service);
+        }
+      }}
+      role="button"
+      tabIndex={0}
+      aria-label={`Open details for ${data.title}`}
       className="service-card bg-zinc-900/95 border border-zinc-800/80 rounded-2xl p-4 sm:p-5 cursor-pointer hover:bg-zinc-800/80 hover:border-zinc-700 transition-all duration-200 flex flex-col sm:flex-row gap-3 sm:gap-4 shadow-md relative"
     >
                           {
@@ -1153,6 +1289,12 @@ Phone: ${service.phoneNumber}`;
                                 <Clock className="w-3 h-3 text-zinc-500" />
                                 <span className="service-hours">{data.hours}</span>
                               </div>
+                            </div>
+                            <div className="data-quality-row" aria-label={`Verification score ${verificationScore} percent, ${getConfidenceLevel(verificationScore)}`}>
+                              <span>{verificationScore}% verified</span>
+                              <span>{getConfidenceLevel(verificationScore)}</span>
+                              <span>{getLastCheckedBy(service)}</span>
+                              {duplicateCount > 1 && <span className="duplicate-risk">Duplicate risk</span>}
                             </div>
                             <div className="service-card-footer mt-3">
                               <span>Open details</span>
@@ -1240,246 +1382,17 @@ Phone: ${service.phoneNumber}`;
           {
     /* Tab Content 2: Full interactive vector map */
   }
-          {currentTab === "map" && <div className="flex-1 flex flex-col relative select-none">
-              
-              {
-    /* Floating Map HUD header */
-  }
-              <div className="absolute top-3 inset-x-3 md:inset-x-6 z-30 bg-zinc-950/90 border border-zinc-850 p-2.5 md:p-3 rounded-xl flex flex-wrap items-center justify-between text-[11px] md:text-xs text-zinc-300 font-bold gap-2 shadow-lg backdrop-blur-xs">
-                <div className="font-label flex items-center gap-1.5 text-white min-w-0">
-                  <Compass className="w-3.5 h-3.5 text-emerald-400 animate-spin" style={{ animationDuration: "24s" }} />
-                  <span className="truncate">{selectedDistrict.toUpperCase()} LOCATION HUB</span>
-                </div>
-                <span className="text-[9px] text-zinc-500 font-label">Zoom: {Math.round(mapZoom * 100)}%</span>
-              </div>
-
-              {
-    /* Vector Map Container */
-  }
-              <div className="flex-1 bg-[#ecf9ff] relative overflow-hidden select-none">
-                <div className="absolute top-18 md:top-20 left-3 md:left-6 right-3 md:right-auto md:max-w-xl z-30 flex gap-2 overflow-x-auto scrollbar-none">
-                  {categoryOptions.map((cat) => {
-    const isActive = mapCategoryFilter === cat.key;
-    return <button
-      key={cat.key}
-      onClick={() => setMapCategoryFilter(cat.key)}
-      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-[10px] font-bold whitespace-nowrap ${isActive ? "bg-zinc-950 text-white border-zinc-800" : "bg-white/90 text-slate-700 border-slate-200 hover:bg-white"}`}
-    >
-                        <Filter className="w-3 h-3" />
-                        {cat.label}
-                      </button>;
-  })}
-                </div>
-                
-                {
-    /* Floating Map Zoom/Reset Controllers */
-  }
-                <div className="absolute right-3 md:right-6 bottom-20 md:bottom-24 z-30 flex flex-col gap-1.5 select-none">
-                  <button
-    onClick={() => setMapZoom((p) => Math.min(4, p + 0.3))}
-    className="w-8 h-8 bg-zinc-900 border border-zinc-800 text-white rounded-lg flex items-center justify-center transition active:scale-90"
-  >
-                    <ZoomIn className="w-4 h-4" />
-                  </button>
-                  <button
-    onClick={() => setMapZoom((p) => Math.max(0.8, p - 0.3))}
-    className="w-8 h-8 bg-zinc-900 border border-zinc-800 text-white rounded-lg flex items-center justify-center transition active:scale-90"
-  >
-                    <ZoomOut className="w-4 h-4" />
-                  </button>
-                  <button
-    onClick={() => {
-      setMapZoom(1);
-      setMapPan({ x: 0, y: 0 });
-    }}
-    className="w-8 h-8 bg-zinc-900 border border-zinc-800 text-white rounded-lg flex items-center justify-center transition active:scale-90"
-  >
-                    <RotateCcw className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-
-                {
-    /* Simulated Grid Layer */
-  }
-                <div
-    style={{
-      transform: `translate(${mapPan.x}px, ${mapPan.y}px) scale(${mapZoom})`,
-      transformOrigin: "center center",
-      transition: isMapDragging ? "none" : "transform 0.15s cubic-bezier(0.1, 0.9, 0.2, 1)",
-      touchAction: "none"
-    }}
-    className={`absolute inset-0 w-full h-full ${isMapDragging ? "cursor-grabbing" : "cursor-grab"}`}
-    onMouseDown={(e) => {
-      setIsMapDragging(true);
-      setMapDragStart({ x: e.clientX - mapPan.x, y: e.clientY - mapPan.y });
-    }}
-    onMouseMove={(e) => {
-      if (!isMapDragging) return;
-      setMapPan({
-        x: e.clientX - mapDragStart.x,
-        y: e.clientY - mapDragStart.y
-      });
-    }}
-    onMouseUp={() => setIsMapDragging(false)}
-    onMouseLeave={() => setIsMapDragging(false)}
-    onTouchStart={(e) => {
-      if (e.touches.length === 1) {
-        setIsMapDragging(true);
-        setMapDragStart({ x: e.touches[0].clientX - mapPan.x, y: e.touches[0].clientY - mapPan.y });
-      }
-    }}
-    onTouchMove={(e) => {
-      if (e.touches.length === 1 && isMapDragging) {
-        setMapPan({
-          x: e.touches[0].clientX - mapDragStart.x,
-          y: e.touches[0].clientY - mapDragStart.y
-        });
-      }
-    }}
-    onTouchEnd={() => setIsMapDragging(false)}
-  >
-                  
-                  {
-    /* Grid Lines */
-  }
-                  <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(14,165,233,0.06)_1px,transparent_1px),linear-gradient(to_bottom,rgba(14,165,233,0.06)_1px,transparent_1px)] bg-[size:16px_16px] opacity-40" />
-
-                  {
-    /* Sea Labels */
-  }
-                  <div className="absolute left-6 top-36 font-black text-[9px] uppercase tracking-widest text-[#0ca5e9]/25 font-mono -rotate-90">Laccadive Sea</div>
-
-                  {
-    /* Shaded Land */
-  }
-                  <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-                    <path
-    d="M 12,0 L 22,12 Q 28,22 42,26 T 34,36 T 44,46 T 62,52 T 48,62 T 48,72 T 74,74 T 58,82 T 44,86 T 66,90 T 56,94 T 72,98 L 100,100 L 100,0 Z"
-    className="fill-[#f2f8f4] stroke-emerald-600/10 stroke-1"
-  />
-                  </svg>
-
-                  {
-    /* Static nodes on map */
-  }
-                  {[
-    { name: "Kasaragod", x: 22, y: 12 },
-    { name: "Kannur", x: 28, y: 22 },
-    { name: "Wayanad", x: 42, y: 26 },
-    { name: "Kozhikode", x: 34, y: 36 },
-    { name: "Malappuram", x: 44, y: 46 },
-    { name: "Palakkad", x: 62, y: 52 },
-    { name: "Kottayam", x: 58, y: 82 }
-  ].map((node) => {
-    const isSelected = selectedDistrict === node.name;
-    return <div
-      key={node.name}
-      style={{ left: `${node.x}%`, top: `${node.y}%` }}
-      className="absolute -translate-x-1/2 -translate-y-1/2 z-10 flex flex-col items-center"
-    >
-                        {isSelected && <span className="absolute w-6 h-6 rounded-full bg-emerald-500/20 animate-ping" />}
-                        <button
-      onClick={() => {
-        setSelectedDistrict(node.name);
-        const locals = LOCALITIES_EN[node.name] || [];
-        setSelectedLocality(locals[0] || "all");
-      }}
-      className={`w-3.5 h-3.5 rounded-full border border-white flex items-center justify-center transition-all ${isSelected ? "bg-emerald-600 scale-125 ring-4 ring-emerald-500/30" : "bg-zinc-400 hover:bg-emerald-600"}`}
-    />
-                        <span className="text-[8px] font-black text-slate-800 bg-white/95 border border-slate-200/80 px-1 py-0.2 rounded shadow-xs mt-1 pointer-events-none whitespace-nowrap">
-                          {node.name}
-                        </span>
-                      </div>;
-  })}
-
-                  {
-    /* Floating Pins for Kasaragod services inside active coordinates */
-  }
-                  {selectedDistrict === "Kasaragod" && <>
-                      {
-    /* Sub-node representing active Manjeshwar locality */
-  }
-                      <div className="absolute left-[24%] top-[14%] z-20 flex flex-col items-center">
-                        <span className="absolute w-12 h-12 rounded-full border border-teal-500/40 animate-ping" style={{ animationDuration: "3s" }} />
-                        <div className="w-4 h-4 bg-teal-600 rounded-full border-2 border-white flex items-center justify-center shadow-md shadow-teal-500/30 animate-pulse">
-                          <div className="w-1.5 h-1.5 rounded-full bg-white" />
-                        </div>
-                        <div className="bg-teal-900 text-white font-extrabold text-[8px] px-2 py-0.5 rounded shadow-lg border border-teal-500/30 mt-1 pointer-events-none whitespace-nowrap uppercase tracking-widest">
-                          Manjeshwar Grid
-                        </div>
-                      </div>
-                    </>}
-
-                  {
-    /* Floating Pins for Kozhikode services inside active coordinates */
-  }
-                  {selectedDistrict === "Kozhikode" && <>
-                      {
-    /* Sub-node representing Mukkali / Chombala */
-  }
-                      <div className="absolute left-[33%] top-[34%] z-20 flex flex-col items-center">
-                        <span className="absolute w-10 h-10 rounded-full border border-emerald-500/40 animate-ping" style={{ animationDuration: "3.5s" }} />
-                        <div className="w-3.5 h-3.5 bg-emerald-600 rounded-full border border-white flex items-center justify-center shadow-md shadow-emerald-500/30 animate-pulse">
-                          <div className="w-1 h-1 rounded-full bg-white" />
-                        </div>
-                        <div className="bg-emerald-950/95 text-emerald-300 font-extrabold text-[8px] px-1.5 py-0.5 rounded shadow-lg border border-emerald-500/30 mt-1 pointer-events-none whitespace-nowrap uppercase tracking-widest scale-90">
-                          Mukkali (Chombala)
-                        </div>
-                      </div>
-
-                      {
-    /* Sub-node representing Vadakara */
-  }
-                      <div className="absolute left-[36%] top-[39%] z-20 flex flex-col items-center">
-                        <span className="absolute w-10 h-10 rounded-full border border-sky-500/40 animate-ping" style={{ animationDuration: "2.8s" }} />
-                        <div className="w-3.5 h-3.5 bg-sky-600 rounded-full border-2 border-white flex items-center justify-center shadow-md shadow-sky-500/30 animate-pulse">
-                          <div className="w-1.5 h-1.5 rounded-full bg-white" />
-                        </div>
-                        <div className="bg-sky-950/95 text-sky-300 font-extrabold text-[8px] px-1.5 py-0.5 rounded shadow-lg border border-sky-500/30 mt-1 pointer-events-none whitespace-nowrap uppercase tracking-widest scale-90">
-                          Vadakara Grid
-                        </div>
-                      </div>
-                    </>}
-
-                  {mapServices.slice(0, 8).map((service, idx) => {
-    const data = service.translations[language] || service.translations.en;
-    const x = 28 + idx * 9 % 38;
-    const y = 24 + idx * 13 % 48;
-    return <button
-      key={`map-${service.id}`}
-      onClick={() => setSelectedDetailService(service)}
-      style={{ left: `${x}%`, top: `${y}%` }}
-      className="absolute z-30 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group"
-      title={data.title}
-    >
-                        <span className={`w-7 h-7 rounded-full border-2 border-white flex items-center justify-center shadow-lg ${service.isEmergency ? "bg-rose-600 text-white" : "bg-emerald-700 text-white"}`}>
-                          {getCustomizedIcon(service)}
-                        </span>
-                        <span className="mt-1 max-w-[100px] truncate bg-white/95 text-slate-800 border border-slate-200 px-1.5 py-0.5 rounded text-[8px] font-black shadow-sm">
-                          {data.title}
-                        </span>
-                      </button>;
-  })}
-
-                </div>
-
-              </div>
-
-              {
-    /* Map instructions panel */
-  }
-              <div className="absolute bottom-18 md:bottom-20 inset-x-3 md:left-6 md:right-auto md:max-w-md bg-zinc-950/95 border border-zinc-800/80 p-3 rounded-2xl flex flex-col gap-1 select-none shadow-lg">
-                <span className="font-label text-[10px] font-black text-white uppercase tracking-wider">Kerala Grid Operations</span>
-                <p className="text-[9px] text-zinc-400 leading-tight">
-                  Drag the viewport to explore the coast. Showing {mapServices.length} services for the current map filter.
-                </p>
-              </div>
-
-            </div>}
-
-          {
-    /* Tab Content 3: Suggest local service form */
-  }
+          {currentTab === "map" && <Suspense fallback={<div className="flex-1 grid place-items-center bg-[#121214] text-zinc-300 text-xs font-black uppercase tracking-widest">Loading real map...</div>}>
+              <ServiceMap
+                services={filteredServices}
+                categoryOptions={categoryOptions}
+                mapCategoryFilter={mapCategoryFilter}
+                setMapCategoryFilter={setMapCategoryFilter}
+                getCategoryName={getCategoryName}
+                setSelectedDetailService={setSelectedDetailService}
+                ui={ui}
+              />
+            </Suspense>}
           {currentTab === "suggest" && <div className="flex-1 overflow-y-auto px-4 md:px-6 pt-4 md:pt-6 pb-24 scrollbar-none">
               <div className="border-b border-zinc-800 pb-3 max-w-5xl mx-auto">
                 <h3 className="font-classical text-lg font-black text-white tracking-wide flex items-center gap-1.5">
@@ -1831,6 +1744,8 @@ Phone: ${service.phoneNumber}`;
     const detailData = selectedDetailService.translations[activeDetailLang] || selectedDetailService.translations["en"];
     const historyLogs = getServiceHistory(selectedDetailService);
     const guidelines = getServiceGuidelines(selectedDetailService);
+    const detailVerificationScore = getVerificationScore(selectedDetailService, duplicateCounts);
+    const detailDuplicateCount = getDuplicateCount(selectedDetailService, duplicateCounts);
     const isRecentVerified = (() => {
       if (!selectedDetailService.lastVerified) return false;
       try {
@@ -1944,6 +1859,17 @@ Phone: ${service.phoneNumber}`;
                         <span className="text-[9px] font-black text-zinc-500 uppercase tracking-wider block mb-0.5">Location</span>
                         <p className="text-[10px] text-zinc-300 leading-tight font-medium">{detailData.location}</p>
                       </div>
+                      <div>
+                        <span className="text-[9px] font-black text-zinc-500 uppercase tracking-wider block mb-0.5">Verification score</span>
+                        <span className="font-bold text-white block">{detailVerificationScore}% - {getConfidenceLevel(detailVerificationScore)}</span>
+                      </div>
+                      <div>
+                        <span className="text-[9px] font-black text-zinc-500 uppercase tracking-wider block mb-0.5">Last checked by</span>
+                        <span className="font-bold text-white block">{getLastCheckedBy(selectedDetailService)}</span>
+                      </div>
+                      {detailDuplicateCount > 1 && <div className="sm:col-span-2 md:col-span-1 xl:col-span-2 rounded-xl border border-amber-500/20 bg-amber-500/10 p-2 text-[10px] font-bold text-amber-200">
+                        Possible duplicate found in this locality. Verify before publishing changes.
+                      </div>}
                     </div>
 
                     {
@@ -2089,14 +2015,14 @@ Phone: ${service.phoneNumber}`;
         {
     /* Global Floating Toast for successful directory additions */
   }
-        {successToast && <div className="absolute top-20 inset-x-6 z-50 bg-emerald-600 text-white px-4 py-2.5 rounded-xl shadow-lg text-center text-[10px] font-extrabold uppercase tracking-widest animate-bounce">
+        {successToast && <div role="status" aria-live="polite" className="absolute top-20 inset-x-6 z-50 bg-emerald-600 text-white px-4 py-2.5 rounded-xl shadow-lg text-center text-[10px] font-extrabold uppercase tracking-widest animate-bounce">
             {successToast}
           </div>}
 
         {
     /* Static virtual bottom nav tab row (matching screenshots) */
   }
-        <div className="bottom-dock absolute bottom-0 inset-x-0 h-16 border-t border-zinc-800/85 flex items-center justify-around z-40 px-3 md:px-10 select-none">
+        <div className="bottom-dock absolute bottom-0 inset-x-0 h-16 border-t border-zinc-800/85 flex items-center justify-around z-40 px-3 md:px-10 select-none" role="tablist" aria-label="Main app tabs">
           {[
     { id: "services", label: ui.services, icon: <Building2 className="w-5 h-5" /> },
     { id: "emergency", label: ui.emergency, icon: <Siren className="w-5 h-5" /> },
@@ -2108,6 +2034,9 @@ Phone: ${service.phoneNumber}`;
     return <button
       key={tab.id}
       onClick={() => setCurrentTab(tab.id)}
+      role="tab"
+      aria-selected={isActive}
+      aria-label={`Open ${tab.label}`}
       className={`dock-button ${isActive ? "is-active" : ""} flex flex-col items-center justify-center gap-1 flex-1 py-1 transition cursor-pointer select-none active:scale-95 ${isActive ? "text-emerald-400 font-bold" : "text-zinc-500 hover:text-zinc-300"}`}
     >
                 {tab.icon}
