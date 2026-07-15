@@ -1071,8 +1071,8 @@ Phone: ${service.phoneNumber}`;
               {
     /* Dynamic scrollable directory area */
   }
-              <div className="service-observatory flex-1 overflow-y-auto px-4 sm:px-5 lg:px-8 pt-3 sm:pt-5 pb-24 scrollbar-none space-y-3 lg:grid lg:grid-cols-2 xl:grid-cols-3 lg:gap-5 lg:space-y-0 lg:items-start">
-                <div className="service-feed-heading flex justify-between items-center text-xs font-black tracking-wider text-zinc-500 uppercase px-1 mb-1 lg:col-span-2 xl:col-span-3">
+              <div className="service-observatory flex-1 overflow-y-auto px-4 sm:px-5 lg:px-8 pt-3 sm:pt-5 pb-24 scrollbar-none space-y-3 lg:grid lg:grid-cols-2 lg:gap-5 lg:space-y-0 lg:items-start">
+                <div className="service-feed-heading flex justify-between items-center text-xs font-black tracking-wider text-zinc-500 uppercase px-1 mb-1 lg:col-span-2">
                   <span>Nearby Services</span>
                   <span>{filteredServices.length} listed</span>
                 </div>
@@ -1099,7 +1099,7 @@ Phone: ${service.phoneNumber}`;
       whileTap={{ scale: 0.99 }}
       transition={{ duration: 0.2, delay: Math.min(index * 0.04, 0.2) }}
       onClick={() => setSelectedDetailService(service)}
-      className="service-card bg-zinc-900/95 border border-zinc-800/80 rounded-2xl p-4 sm:p-5 min-h-[128px] lg:min-h-[154px] cursor-pointer hover:bg-zinc-800/80 hover:border-zinc-700 transition-all duration-200 flex gap-3 sm:gap-4 shadow-md relative overflow-hidden"
+      className="service-card bg-zinc-900/95 border border-zinc-800/80 rounded-2xl p-4 sm:p-5 cursor-pointer hover:bg-zinc-800/80 hover:border-zinc-700 transition-all duration-200 flex flex-col sm:flex-row gap-3 sm:gap-4 shadow-md relative"
     >
                           {
       /* Emergency Stripe */
@@ -1117,18 +1117,18 @@ Phone: ${service.phoneNumber}`;
       /* Detail block on right */
     }
                           <div className="flex-1 min-w-0">
-                            <div className="flex items-start justify-between gap-2">
-                              <h3 className="font-classical text-base font-black text-white leading-snug tracking-tight pr-1 line-clamp-2">
+                            <div className="service-card-head flex flex-col min-[520px]:flex-row min-[520px]:items-start min-[520px]:justify-between gap-2">
+                              <h3 className="service-card-title font-classical text-base font-black text-white leading-snug tracking-tight pr-1">
                                 {data.title}
                               </h3>
                               
                               {
       /* Status indicator capsule */
     }
-                              {isVerifiedPulse ? <span className="shrink-0 text-[9px] font-black tracking-tight text-emerald-400 bg-emerald-950/40 border border-emerald-500/20 px-2 py-0.5 rounded-full flex items-center gap-1">
+                              {isVerifiedPulse ? <span className="service-status shrink-0 text-[9px] font-black tracking-tight text-emerald-400 bg-emerald-950/40 border border-emerald-500/20 px-2 py-0.5 rounded-full flex items-center gap-1">
                                   <span className="w-1 h-1 rounded-full bg-emerald-400 animate-ping" />
                                   <span className="font-label">Verified</span>
-                                </span> : <span className="shrink-0 text-[9px] font-black tracking-tight text-amber-400 bg-amber-950/40 border border-amber-500/20 px-2 py-0.5 rounded-full">
+                                </span> : <span className="service-status shrink-0 text-[9px] font-black tracking-tight text-amber-400 bg-amber-950/40 border border-amber-500/20 px-2 py-0.5 rounded-full">
                                   May be outdated
                                 </span>}
                             </div>
@@ -1137,7 +1137,7 @@ Phone: ${service.phoneNumber}`;
                               {data.category}
                             </p>
 
-                            <p className="hidden sm:block text-xs lg:text-[11px] text-zinc-400/90 leading-relaxed mt-2 line-clamp-2">
+                            <p className="service-card-description text-xs lg:text-[11px] text-zinc-400/90 leading-relaxed mt-2">
                               {data.description}
                             </p>
 
@@ -1151,8 +1151,12 @@ Phone: ${service.phoneNumber}`;
                               </div>
                               <div className="flex items-center gap-1">
                                 <Clock className="w-3 h-3 text-zinc-500" />
-                                <span className="truncate max-w-[170px] sm:max-w-[360px] lg:max-w-[220px]">{data.hours}</span>
+                                <span className="service-hours">{data.hours}</span>
                               </div>
+                            </div>
+                            <div className="service-card-footer mt-3">
+                              <span>Open details</span>
+                              <span aria-hidden="true">+</span>
                             </div>
                           </div>
 

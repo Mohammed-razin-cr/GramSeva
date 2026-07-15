@@ -909,6 +909,153 @@ textarea {
   }
 }
 
+/* Issue #3: service cards must expand instead of clipping content. */
+.service-observatory {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 430px), 1fr));
+  align-content: start;
+}
+
+.service-observatory .service-feed-heading {
+  grid-column: 1 / -1;
+}
+
+.service-card {
+  min-height: 0 !important;
+  height: auto !important;
+  overflow: visible !important;
+  padding: clamp(16px, 2vw, 24px) !important;
+  align-items: flex-start;
+}
+
+.service-card-head {
+  min-width: 0;
+}
+
+.service-card-title {
+  overflow: visible;
+  display: block;
+  word-break: normal;
+  overflow-wrap: anywhere;
+  hyphens: auto;
+}
+
+.service-status {
+  align-self: flex-start;
+  white-space: nowrap;
+  border-radius: 999px;
+}
+
+.service-card-description {
+  display: block !important;
+  color: #9aa6b4 !important;
+  overflow: visible;
+  max-width: 62ch;
+}
+
+.service-card .service-hours {
+  display: inline;
+  max-width: none;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  line-height: 1.45;
+}
+
+.service-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(216, 234, 255, 0.14);
+  color: #d8eaff;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.service-card-footer span:last-child {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border: 1px solid #ff4105;
+  border-radius: 8px;
+  color: #ff4105;
+}
+
+.service-card:focus-visible,
+.category-pill:focus-visible,
+.dock-button:focus-visible,
+.follow-link:focus-visible {
+  outline: 1px solid #ff4105;
+  outline-offset: 3px;
+}
+
+@media (min-width: 1280px) {
+  .directory-frame {
+    max-width: min(1320px, calc(100vw - 48px)) !important;
+  }
+}
+
+@media (max-width: 1024px) {
+  .gram-header {
+    padding-top: 28px !important;
+    padding-bottom: 22px !important;
+  }
+
+  .hero-wireframe {
+    max-width: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .directory-frame {
+    max-width: 100% !important;
+    min-height: calc(100dvh - 64px) !important;
+    border-radius: 0 !important;
+  }
+
+  .service-observatory {
+    grid-template-columns: 1fr;
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+  }
+
+  .service-card {
+    gap: 14px;
+  }
+
+  .service-card .icon-tile {
+    width: 46px;
+    height: 46px;
+  }
+
+  .header-metric {
+    padding: 8px;
+  }
+
+  .header-metric span {
+    font-size: 14px;
+  }
+
+  .header-metric small {
+    font-size: 7px;
+    letter-spacing: 0.08em;
+  }
+
+  .hero-wireframe {
+    padding: 14px;
+  }
+
+  .hero-wireframe p {
+    font-size: 10px;
+    line-height: 1.55;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

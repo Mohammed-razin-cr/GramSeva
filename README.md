@@ -1,6 +1,6 @@
 # GramSeva
 
-GramSeva is a local civic-service directory for Kerala communities. It helps residents find nearby public services, verified contacts, working hours, locations, emergency support, and volunteer-updated records in multiple languages.
+GramSeva is a local civic-service directory for Kerala communities. It helps residents find nearby public services, verified contacts, working hours, locations, emergency support, document checklists, and volunteer-updated records in multiple languages.
 
 ## What It Does
 
@@ -8,17 +8,18 @@ GramSeva is a local civic-service directory for Kerala communities. It helps res
 - Filter by Kerala district and locality, with Kozhikode and Mukkali ready by default.
 - View service details, verification history, guidelines, and map context.
 - Add community suggestions that are saved locally in the browser.
-- Switch between English, Malayalam, Hindi, and Telugu.
+- Switch between English, Malayalam, Hindi, Telugu, and Kannada.
 - Use an offline-ready mode backed by local browser storage.
 
 ## Tech Stack
 
 - React 19
-- TypeScript
+- JavaScript / JSX
 - Vite
 - Tailwind CSS
 - Recharts
 - Lucide React icons
+- Motion animations
 
 ## Run Locally
 
@@ -37,7 +38,7 @@ Open `http://localhost:3000` in your browser.
 npm run dev      # Start the local Vite server
 npm run build    # Create a production build
 npm run preview  # Preview the production build
-npm run lint     # Run TypeScript checks
+npm run lint     # Run the build validation script
 ```
 
 ## Environment
