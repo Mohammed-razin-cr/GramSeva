@@ -35,6 +35,8 @@ const CATEGORY_STYLE = {
   government: { color: "#7687ff", short: "G" }
 };
 
+const MAX_RENDERED_MARKERS = 300;
+
 function hashString(value = "") {
   let hash = 0;
   for (let i = 0; i < value.length; i += 1) {
@@ -69,17 +71,16 @@ function createMarkerIcon(service) {
   });
 }
 
-function FitToServices({ services }) {
+function FitToServices({ coordinates }) {
   const map = useMap();
-  const bounds = useMemo(() => services.map((service) => getServiceCoordinates(service)), [services]);
 
   useEffect(() => {
-    if (bounds.length > 1) {
-      map.fitBounds(bounds, { padding: [32, 32], maxZoom: 14 });
-    } else if (bounds.length === 1) {
-      map.setView(bounds[0], 13);
+    if (coordinates.length > 1) {
+      map.flyToBounds(coordinates, { padding: [32, 32], maxZoom: 14, duration: 0.55, easeLinearity: 0.3 });
+    } else if (coordinates.length === 1) {
+      map.flyTo(coordinates[0], 13, { duration: 0.45 });
     }
-  }, [bounds, map]);
+  }, [coordinates, map]);
 
   return null;
 }
@@ -97,7 +98,14 @@ export default function ServiceMap({
     return mapCategoryFilter === "all" ? services : services.filter((service) => service.categoryKey === mapCategoryFilter);
   }, [mapCategoryFilter, services]);
 
-  const center = mapServices[0] ? getServiceCoordinates(mapServices[0]) : DISTRICT_COORDINATES.Kozhikode;
+  const visibleMapServices = useMemo(() => mapServices.slice(0, MAX_RENDERED_MARKERS), [mapServices]);
+  const preparedMarkers = useMemo(() => visibleMapServices.map((service) => ({
+    service,
+    coordinates: getServiceCoordinates(service),
+    icon: createMarkerIcon(service)
+  })), [visibleMapServices]);
+  const markerCoordinates = useMemo(() => preparedMarkers.map((marker) => marker.coordinates), [preparedMarkers]);
+  const center = markerCoordinates[0] || DISTRICT_COORDINATES.Kozhikode;
 
   return (
     <div className="real-map-shell flex-1 flex flex-col gap-4 p-4 sm:p-5">
@@ -113,22 +121,22 @@ export default function ServiceMap({
             {cat.key === "all" ? ui.mapFilter : getCategoryName(cat.key)}
           </button>
         ))}
+        <span className="real-map-count" aria-live="polite">{visibleMapServices.length} of {mapServices.length} locations shown</span>
       </div>
 
       <div className="real-map-panel">
-        <MapContainer center={center} zoom={12} scrollWheelZoom className="real-map-canvas" aria-label="Real service location map">
+        <MapContainer center={center} zoom={12} scrollWheelZoom preferCanvas zoomAnimation fadeAnimation markerZoomAnimation className="real-map-canvas" aria-label="Real service location map">
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-          <FitToServices services={mapServices} />
-          {mapServices.map((service) => {
+          <FitToServices coordinates={markerCoordinates} />
+          {preparedMarkers.map(({ service, coordinates, icon }) => {
             const data = service.translations.en || Object.values(service.translations)[0];
-            const coords = getServiceCoordinates(service);
             const style = CATEGORY_STYLE[service.categoryKey] || CATEGORY_STYLE.government;
             return (
-              <Marker key={service.id} position={coords} icon={createMarkerIcon(service)}>
-                <CircleMarker center={coords} radius={18} pathOptions={{ color: style.color, fillColor: style.color, fillOpacity: 0.08, weight: 1 }} />
+              <Marker key={service.id} position={coordinates} icon={icon}>
+                <CircleMarker center={coordinates} radius={18} pathOptions={{ color: style.color, fillColor: style.color, fillOpacity: 0.08, weight: 1 }} />
                 <Popup>
                   <div className="real-map-popup">
                     <strong>{data.title}</strong>

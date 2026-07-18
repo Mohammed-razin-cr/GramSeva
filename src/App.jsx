@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState, useEffect, useRef } from "react";
+import { lazy, Suspense, useState, useEffect, useRef, useMemo, useTransition } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import {
   Phone,
@@ -326,10 +326,23 @@ function DirectoryApp() {
   const [reportText, setReportText] = useState("");
   const [isLargeText, setIsLargeText] = useState(false);
   const [isHighContrast, setIsHighContrast] = useState(false);
+  const [isUiPending, startUiTransition] = useTransition();
+  const [settledSearchQuery, setSettledSearchQuery] = useState("");
   const searchInputRef = useRef(null);
+  const navigateToTab = (tabId) => {
+    if (tabId === currentTab) return;
+    startUiTransition(() => setCurrentTab(tabId));
+  };
+  const chooseCategory = (categoryKey) => {
+    startUiTransition(() => setSelectedCategory(categoryKey));
+  };
   useEffect(() => {
     setVisibleCount(12);
   }, [searchQuery, selectedCategory, selectedDistrict, selectedLocality, isNearMeActive, sortByProximity]);
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => setSettledSearchQuery(searchQuery), 140);
+    return () => window.clearTimeout(timeoutId);
+  }, [searchQuery]);
   const getSimulatedDistance = (service) => {
     if (service.id === "serv-m1") return 1.2;
     if (service.id === "serv-m2") return 0.4;
@@ -393,32 +406,38 @@ function DirectoryApp() {
       ...(CATEGORY_ALIASES[service.categoryKey] || [])
     ].join(" "));
   };
-  const getSearchScore = (service, query) => {
-    const normalizedQuery = normalizeSearchText(query);
+  const getSearchScore = (haystack, haystackTokens, normalizedQuery) => {
     if (!normalizedQuery) return 0;
-
-    const haystack = getServiceSearchText(service);
     if (haystack.includes(normalizedQuery)) return 120 + normalizedQuery.length;
 
     const queryTokens = normalizedQuery.split(" ").filter(Boolean);
-    const haystackTokens = haystack.split(" ").filter(Boolean);
     let score = 0;
 
     queryTokens.forEach((queryToken) => {
-      if (haystackTokens.some((token) => token === queryToken)) {
-        score += 32;
-        return;
+      let bestTokenScore = 0;
+      const maxDistance = queryToken.length > 7 ? 2 : 1;
+
+      for (const token of haystackTokens) {
+        if (token === queryToken) {
+          bestTokenScore = 32;
+          break;
+        }
+        if (bestTokenScore < 20 && (token.startsWith(queryToken) || token.includes(queryToken))) {
+          bestTokenScore = 20;
+          continue;
+        }
+        if (
+          bestTokenScore < 14
+          && queryToken.length >= 4
+          && token.length >= 4
+          && Math.abs(token.length - queryToken.length) <= maxDistance
+          && levenshteinDistance(queryToken, token) <= maxDistance
+        ) {
+          bestTokenScore = 14;
+        }
       }
-      if (haystackTokens.some((token) => token.startsWith(queryToken) || token.includes(queryToken))) {
-        score += 20;
-        return;
-      }
-      const typoMatch = haystackTokens.some((token) => {
-        if (queryToken.length < 4 || token.length < 4) return false;
-        const maxDistance = queryToken.length > 7 ? 2 : 1;
-        return levenshteinDistance(queryToken, token) <= maxDistance;
-      });
-      if (typoMatch) score += 14;
+
+      score += bestTokenScore;
     });
 
     return score;
@@ -773,7 +792,7 @@ function DirectoryApp() {
     setIsEmergencyCheck(false);
     setSuccessToast("Service suggested successfully!");
     setTimeout(() => setSuccessToast(null), 3e3);
-    setCurrentTab("services");
+    navigateToTab("services");
   };
   const getCategoryIcon = (categoryKey) => {
     switch (categoryKey) {
@@ -956,14 +975,25 @@ Phone: ${service.phoneNumber}`;
     }
     return ["Aadhaar card", "Address proof", "Phone number", "Relevant application or receipt"];
   };
-  const duplicateCounts = services.reduce((acc, service) => {
+  const duplicateCounts = useMemo(() => services.reduce((acc, service) => {
     const key = getDuplicateKey(service);
     acc[key] = (acc[key] || 0) + 1;
     return acc;
-  }, {});
-  const normalizedSearchQuery = normalizeSearchText(searchQuery);
-  const filteredServices = services
-    .map((service) => ({ service, searchScore: getSearchScore(service, normalizedSearchQuery) }))
+  }, {}), [services]);
+  const searchableServices = useMemo(() => services.map((service) => {
+    const searchText = getServiceSearchText(service);
+    return {
+      service,
+      searchText,
+      searchTokens: [...new Set(searchText.split(" ").filter(Boolean))]
+    };
+  }), [services]);
+  const normalizedSearchQuery = normalizeSearchText(settledSearchQuery);
+  const filteredServices = useMemo(() => searchableServices
+    .map(({ service, searchText, searchTokens }) => ({
+      service,
+      searchScore: getSearchScore(searchText, searchTokens, normalizedSearchQuery)
+    }))
     .filter(({ service, searchScore }) => {
       if (selectedCategory !== "all" && service.categoryKey !== selectedCategory) {
         if (selectedCategory === "agriculture" && service.translations.en.category.toLowerCase() === "ration") {
@@ -981,8 +1011,10 @@ Phone: ${service.phoneNumber}`;
       if (isNearMeActive || sortByProximity) return getSimulatedDistance(a.service) - getSimulatedDistance(b.service);
       return 0;
     })
-    .map(({ service }) => service);
-  const emergencyServices = filteredServices.filter((service) => service.isEmergency || service.categoryKey === "health" || /police|ambulance|hospital|fire|emergency|helpline/i.test(service.translations.en.title)).slice(0, 24);
+    .map(({ service }) => service), [searchableServices, normalizedSearchQuery, selectedCategory, selectedDistrict, selectedLocality, isNearMeActive, nearMeDistance, sortByProximity]);
+  const emergencyServices = useMemo(() => filteredServices
+    .filter((service) => service.isEmergency || service.categoryKey === "health" || /police|ambulance|hospital|fire|emergency|helpline/i.test(service.translations.en.title))
+    .slice(0, 24), [filteredServices]);
   const searchSuggestions = searchQuery.trim().length > 0 ? filteredServices.slice(0, 5).map((service) => {
     const data = service.translations[language] || service.translations.en;
     return { id: service.id, label: data.title, helper: data.category };
@@ -1000,12 +1032,12 @@ Phone: ${service.phoneNumber}`;
           <span>GramSeva</span>
         </div>
         <div className="nav-links" role="tablist" aria-label="Directory sections">
-          <button onClick={() => setCurrentTab("services")} className={currentTab === "services" ? "active" : ""} role="tab" aria-selected={currentTab === "services"}>Directory</button>
-          <button onClick={() => setCurrentTab("emergency")} className={currentTab === "emergency" ? "active" : ""} role="tab" aria-selected={currentTab === "emergency"}>Emergency</button>
-          <button onClick={() => setCurrentTab("map")} className={currentTab === "map" ? "active" : ""} role="tab" aria-selected={currentTab === "map"}>Map Grid</button>
-          <button onClick={() => setCurrentTab("suggest")} className={currentTab === "suggest" ? "active" : ""} role="tab" aria-selected={currentTab === "suggest"}>Contribute</button>
+          <button onClick={() => navigateToTab("services")} className={currentTab === "services" ? "active" : ""} role="tab" aria-selected={currentTab === "services"}>Directory</button>
+          <button onClick={() => navigateToTab("emergency")} className={currentTab === "emergency" ? "active" : ""} role="tab" aria-selected={currentTab === "emergency"}>Emergency</button>
+          <button onClick={() => navigateToTab("map")} className={currentTab === "map" ? "active" : ""} role="tab" aria-selected={currentTab === "map"}>Map Grid</button>
+          <button onClick={() => navigateToTab("suggest")} className={currentTab === "suggest" ? "active" : ""} role="tab" aria-selected={currentTab === "suggest"}>Contribute</button>
         </div>
-        <button onClick={() => setCurrentTab("profile")} className="follow-link">Open Controls</button>
+        <button onClick={() => navigateToTab("profile")} className="follow-link">Open Controls</button>
       </nav>
       
       {
@@ -1161,11 +1193,12 @@ Phone: ${service.phoneNumber}`;
     /* Primary search input */
   }
           <div className="relative md:max-w-3xl">
-            <div className={`service-search bg-white flex items-center mt-3 border transition ${isSearchFocused ? "is-focused" : ""}`}>
+            <div className={`service-search bg-white flex items-center mt-3 border ${isSearchFocused ? "is-focused" : ""} ${searchQuery !== settledSearchQuery ? "is-searching" : ""}`}>
               <Search className="w-4 h-4 text-slate-400 ml-3 shrink-0" />
               <input
     ref={searchInputRef}
     type="text"
+    aria-busy={searchQuery !== settledSearchQuery}
     aria-label="Search services by name, category, place, contact, or language"
     placeholder={t.searchPlaceholder || "Search services..."}
     value={searchQuery}
@@ -1178,7 +1211,7 @@ Phone: ${service.phoneNumber}`;
                   <X className="w-4 h-4" />
                 </button> : <span className="search-shortcut" aria-hidden="true"><Keyboard className="w-3.5 h-3.5" /> /</span>}
             </div>
-            {isSearchFocused && searchSuggestions.length > 0 && <div className="absolute top-full mt-2 left-0 right-0 z-40 bg-white/95 backdrop-blur-xl text-slate-900 border border-slate-200 rounded-2xl shadow-xl p-2 animate-soft-rise">
+            {isSearchFocused && searchSuggestions.length > 0 && <div className="search-suggestions absolute top-full mt-2 left-0 right-0 z-40 bg-white/95 text-slate-900 border border-slate-200 rounded-xl shadow-xl p-2">
                 <div className="px-2 pb-1 text-[10px] font-black uppercase tracking-wider text-slate-400">{ui.searchSuggestions}</div>
                 {searchSuggestions.map((item) => <button
     key={item.id}
@@ -1196,7 +1229,16 @@ Phone: ${service.phoneNumber}`;
         {
     /* View switcher container */
   }
-        <div className="app-content-shell flex-1 flex flex-col min-h-0 bg-[#101214]">
+        <div className={`app-content-shell flex-1 flex flex-col min-h-0 bg-[#101214] ${isUiPending ? "is-pending" : ""}`} aria-busy={isUiPending}>
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={currentTab}
+              initial={shouldReduceMotion ? false : { opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: -4 }}
+              transition={{ duration: shouldReduceMotion ? 0 : 0.14, ease: [0.2, 0.8, 0.2, 1] }}
+              className="tab-surface flex-1 flex flex-col min-h-0"
+            >
           
           {
     /* Tab Content 1: Services Directory List */
@@ -1210,7 +1252,7 @@ Phone: ${service.phoneNumber}`;
     const isActive = selectedCategory === cat.key;
     return <button
       key={cat.key}
-      onClick={() => setSelectedCategory(cat.key)}
+      onClick={() => chooseCategory(cat.key)}
       aria-pressed={isActive}
       aria-label={`Show ${cat.label} services`}
       className={`category-pill ${isActive ? "is-active" : ""} flex items-center space-x-1.5 px-3.5 py-2 rounded-full text-xs font-bold transition whitespace-nowrap border shrink-0 active:scale-95 ${isActive ? "bg-zinc-800 text-white border-emerald-500/30 shadow-sm" : "bg-transparent text-zinc-400 border-zinc-800/60 hover:text-white hover:border-zinc-700"}`}
@@ -1260,7 +1302,7 @@ Phone: ${service.phoneNumber}`;
                   <span className="service-feed-count">Showing {Math.min(visibleCount, filteredServices.length)} of {filteredServices.length}</span>
                 </div>
 
-                <AnimatePresence initial={false}>
+                <AnimatePresence initial={false} mode="popLayout">
                   {filteredServices.length > 0 ? filteredServices.slice(0, visibleCount).map((service, index) => {
     const data = service.translations[language] || service.translations["en"];
     const isVerifiedPulse = (() => {
@@ -1278,11 +1320,13 @@ Phone: ${service.phoneNumber}`;
     const duplicateCount = getDuplicateCount(service, duplicateCounts);
     return <motion.div
       key={service.id}
-      initial={shouldReduceMotion ? false : { opacity: 0, y: 8 }}
+      layout={shouldReduceMotion ? false : "position"}
+      initial={shouldReduceMotion ? false : { opacity: 0, y: 5 }}
       animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
-      whileHover={shouldReduceMotion ? undefined : { y: -4, scale: 1.01 }}
+      exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: -4 }}
+      whileHover={shouldReduceMotion ? undefined : { y: -2 }}
       whileTap={shouldReduceMotion ? undefined : { scale: 0.99 }}
-      transition={{ duration: shouldReduceMotion ? 0 : 0.2, delay: shouldReduceMotion ? 0 : Math.min(index * 0.04, 0.2) }}
+      transition={{ duration: shouldReduceMotion ? 0 : 0.16, delay: shouldReduceMotion ? 0 : Math.min(index * 0.012, 0.08), ease: [0.2, 0.8, 0.2, 1] }}
       onClick={() => setSelectedDetailService(service)}
       onKeyDown={(event) => {
         if (event.key === "Enter" || event.key === " ") {
@@ -1791,6 +1835,8 @@ Phone: ${service.phoneNumber}`;
 
             </div>}
 
+            </motion.div>
+          </AnimatePresence>
         </div>
 
         {
@@ -2100,7 +2146,7 @@ Phone: ${service.phoneNumber}`;
     return <button
       key={tab.id}
       type="button"
-      onClick={() => setCurrentTab(tab.id)}
+      onClick={() => navigateToTab(tab.id)}
       role="tab"
       aria-selected={isActive}
       aria-current={isActive ? "page" : undefined}
