@@ -310,6 +310,15 @@ a {
   transition: background 160ms ease, transform 160ms ease;
 }
 
+.service-feed-heading {
+  position: static;
+  z-index: auto;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  background: transparent;
+  backdrop-filter: none;
+}
+
 .emergency-shortcut:hover {
   background: #9f1239;
   transform: translateY(-1px);
