@@ -1137,10 +1137,12 @@ Phone: ${service.phoneNumber}`;
             <div className="flex-1 min-w-0">
               <p className="font-label text-[9px] uppercase tracking-[0.32em] text-signal-orange mb-1">GramSeva command grid</p>
               <h2 className="header-title font-classical text-3xl lg:text-5xl font-black text-white tracking-tight truncate leading-none drop-shadow-sm">
-                {selectedLocality === "all" ? "Manjeshwaram" : selectedLocality} Panchayat
+                {selectedLocality === "all"
+                  ? selectedDistrict === "all" ? "Kerala Service Directory" : `${selectedDistrict} Service Directory`
+                  : `${selectedLocality} Panchayat`}
               </h2>
               <p className="text-xs lg:text-sm text-emerald-100/95 font-semibold tracking-wide mt-1">
-                {selectedDistrict} District &middot; {filteredServices.length} services
+                {selectedDistrict === "all" ? "All Kerala districts" : `${selectedDistrict} District`} &middot; {filteredServices.length} services
               </p>
             </div>
             
@@ -1149,17 +1151,20 @@ Phone: ${service.phoneNumber}`;
   }
             <div className="language-switcher flex bg-black/20 p-0.5 border border-white/15 shrink-0">
               {[
-    { code: "en", label: "EN" },
-    { code: "ml", label: "\u0D2E\u0D32" },
-    { code: "hi", label: "\u0939\u093F" },
-    { code: "te", label: "\u0C24\u0C46" },
-    { code: "kn", label: "\u0C95" }
+    { code: "en", label: "EN", name: "English" },
+    { code: "ml", label: "\u0D2E\u0D32", name: "Malayalam" },
+    { code: "hi", label: "\u0939\u093F", name: "Hindi" },
+    { code: "te", label: "\u0C24\u0C46", name: "Telugu" },
+    { code: "kn", label: "\u0C95", name: "Kannada" }
   ].map((lang) => {
     const isActive = language === lang.code;
     return <button
+      type="button"
       key={lang.code}
       onClick={() => setLanguage(lang.code)}
       aria-pressed={isActive}
+      aria-label={`Use ${lang.name}`}
+      title={lang.name}
       className={isActive ? "is-active" : ""}
     >
                     {lang.label}
@@ -1509,10 +1514,11 @@ Phone: ${service.phoneNumber}`;
               <form onSubmit={handleAddService} className="max-w-5xl mx-auto mt-4 grid gap-3.5 text-xs md:grid-cols-2">
                 
                 <div className="md:col-span-2">
-                  <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">
+                  <label htmlFor="suggest-service-title" className="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">
                     Service Title *
                   </label>
                   <input
+    id="suggest-service-title"
     type="text"
     required
     placeholder="e.g. Primary Health Centre Subcenter"
@@ -1524,10 +1530,11 @@ Phone: ${service.phoneNumber}`;
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:col-span-2">
                   <div>
-                    <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">
+                    <label htmlFor="suggest-service-category" className="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">
                       Category *
                     </label>
                     <select
+    id="suggest-service-category"
     value={newCategory}
     onChange={(e) => setNewCategory(e.target.value)}
     className="w-full bg-zinc-900 border border-zinc-800 text-white rounded-xl px-2 py-2 focus:outline-none focus:border-emerald-500"
@@ -1541,10 +1548,11 @@ Phone: ${service.phoneNumber}`;
                   </div>
 
                   <div>
-                    <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">
+                    <label htmlFor="suggest-service-phone" className="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">
                       Phone Number *
                     </label>
                     <input
+    id="suggest-service-phone"
     type="tel"
     required
     placeholder="+91 XXXXX XXXXX"
@@ -1556,10 +1564,11 @@ Phone: ${service.phoneNumber}`;
                 </div>
 
                 <div className="md:col-span-2">
-                  <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">
+                  <label htmlFor="suggest-service-description" className="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">
                     Description & Service details *
                   </label>
                   <textarea
+    id="suggest-service-description"
     required
     rows={2.5}
     placeholder="Describe what help, documents, or aids are provided here..."
@@ -1571,10 +1580,11 @@ Phone: ${service.phoneNumber}`;
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:col-span-2">
                   <div>
-                    <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">
+                    <label htmlFor="suggest-service-hours" className="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">
                       Operating Hours
                     </label>
                     <input
+    id="suggest-service-hours"
     type="text"
     placeholder="e.g. 9:00 AM - 4:00 PM"
     value={newHours}
@@ -1583,10 +1593,11 @@ Phone: ${service.phoneNumber}`;
   />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">
+                    <label htmlFor="suggest-service-contact" className="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">
                       Contact Name
                     </label>
                     <input
+    id="suggest-service-contact"
     type="text"
     placeholder="e.g. Sister Lakshmi"
     value={newContact}
@@ -1598,10 +1609,11 @@ Phone: ${service.phoneNumber}`;
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:col-span-2">
                   <div>
-                    <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">
+                    <label htmlFor="suggest-service-district" className="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">
                       District
                     </label>
                     <select
+    id="suggest-service-district"
     value={newDistrict}
     onChange={(e) => {
       setNewDistrict(e.target.value);
@@ -1614,10 +1626,11 @@ Phone: ${service.phoneNumber}`;
                     </select>
                   </div>
                   <div>
-                    <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">
+                    <label htmlFor="suggest-service-locality" className="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">
                       Locality
                     </label>
                     <select
+    id="suggest-service-locality"
     value={newLocality}
     onChange={(e) => setNewLocality(e.target.value)}
     className="w-full bg-zinc-900 border border-zinc-800 text-white rounded-xl px-2 py-2 focus:outline-none focus:border-emerald-500"
@@ -1628,10 +1641,11 @@ Phone: ${service.phoneNumber}`;
                 </div>
 
                 <div className="md:col-span-2">
-                  <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">
+                  <label htmlFor="suggest-service-address" className="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">
                     Landmark / Address
                   </label>
                   <input
+    id="suggest-service-address"
     type="text"
     placeholder="e.g. Opposite Local Library block"
     value={newLocation}
@@ -1691,7 +1705,10 @@ Phone: ${service.phoneNumber}`;
                     <span className="text-[9px] text-zinc-400 block">Use locally saved directory data</span>
                   </div>
                   <button
+    type="button"
     onClick={() => setIsOfflineMode(!isOfflineMode)}
+    aria-label="Use locally saved directory data"
+    aria-pressed={isOfflineMode}
     className={`p-2 rounded-xl transition ${isOfflineMode ? "bg-amber-500/20 text-amber-300" : "bg-emerald-500/20 text-emerald-300"}`}
   >
                     {isOfflineMode ? <WifiOff className="w-5 h-5" /> : <Wifi className="w-5 h-5" />}
@@ -1706,8 +1723,9 @@ Phone: ${service.phoneNumber}`;
                   
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="text-[9px] text-zinc-400 font-bold uppercase tracking-wider block mb-1">District</label>
+                      <label htmlFor="profile-district" className="text-[9px] text-zinc-400 font-bold uppercase tracking-wider block mb-1">District</label>
                       <select
+    id="profile-district"
     value={selectedDistrict}
     onChange={(e) => {
       setSelectedDistrict(e.target.value);
@@ -1722,8 +1740,9 @@ Phone: ${service.phoneNumber}`;
                     </div>
 
                     <div>
-                      <label className="text-[9px] text-zinc-400 font-bold uppercase tracking-wider block mb-1">Locality</label>
+                      <label htmlFor="profile-locality" className="text-[9px] text-zinc-400 font-bold uppercase tracking-wider block mb-1">Locality</label>
                       <select
+    id="profile-locality"
     value={selectedLocality}
     onChange={(e) => setSelectedLocality(e.target.value)}
     className="w-full bg-zinc-950 border border-zinc-800 text-white rounded-lg p-1.5 text-[10px] outline-none"
@@ -1745,6 +1764,7 @@ Phone: ${service.phoneNumber}`;
                       <span className="text-[9px] text-zinc-400 block">Sort and filter by approximate distance</span>
                     </div>
                     <button
+    type="button"
     onClick={() => {
       const nextVal = !isNearMeActive;
       setIsNearMeActive(nextVal);
@@ -1753,6 +1773,8 @@ Phone: ${service.phoneNumber}`;
         setSelectedLocality("all");
       }
     }}
+    aria-label="Sort and filter by approximate distance"
+    aria-pressed={isNearMeActive}
     className={`p-2 rounded-xl transition ${isNearMeActive ? "bg-amber-500/20 text-amber-300" : "bg-zinc-950 text-zinc-500"}`}
   >
                       <Compass className="w-5 h-5 animate-spin" style={{ animationDuration: isNearMeActive ? "8s" : "0s" }} />
@@ -1785,7 +1807,7 @@ Phone: ${service.phoneNumber}`;
                 <span className="font-black text-white block uppercase tracking-wider">Local Data Status</span>
                 <div className="flex justify-between font-mono text-[10px]">
                   <span>Directory records:</span>
-                  <span className="text-emerald-400">1,000 services</span>
+                  <span className="text-emerald-400">{services.length.toLocaleString("en-IN")} services</span>
                 </div>
                 <div className="flex justify-between font-mono text-[10px]">
                   <span>Saved in browser:</span>
@@ -1800,14 +1822,18 @@ Phone: ${service.phoneNumber}`;
               <div className="bg-zinc-900/40 border border-zinc-800/50 rounded-2xl p-4 text-[11px] text-zinc-400 space-y-3">
                 <span className="font-black text-white block uppercase tracking-wider">{ui.accessibility}</span>
                 <button
+    type="button"
     onClick={() => setIsLargeText(!isLargeText)}
+    aria-pressed={isLargeText}
     className={`w-full flex items-center justify-between rounded-xl border px-3 py-2 transition ${isLargeText ? "bg-emerald-500/15 border-emerald-500/30 text-emerald-300" : "bg-zinc-950 border-zinc-800 text-zinc-300"}`}
   >
                   <span className="flex items-center gap-2 font-bold"><Type className="w-4 h-4" />{ui.largeText}</span>
                   <span>{isLargeText ? "On" : "Off"}</span>
                 </button>
                 <button
+    type="button"
     onClick={() => setIsHighContrast(!isHighContrast)}
+    aria-pressed={isHighContrast}
     className={`w-full flex items-center justify-between rounded-xl border px-3 py-2 transition ${isHighContrast ? "bg-emerald-500/15 border-emerald-500/30 text-emerald-300" : "bg-zinc-950 border-zinc-800 text-zinc-300"}`}
   >
                   <span className="flex items-center gap-2 font-bold"><Eye className="w-4 h-4" />{ui.highContrast}</span>
@@ -1819,13 +1845,19 @@ Phone: ${service.phoneNumber}`;
     /* Reset State Button */
   }
               <button
+    type="button"
     onClick={() => {
       setSearchQuery("");
       setSelectedCategory("all");
-      setSelectedDistrict("Kasaragod");
-      setSelectedLocality("Manjeshwar");
+      setMapCategoryFilter("all");
+      setSelectedDistrict("Kozhikode");
+      setSelectedLocality("Mukkali");
       setIsNearMeActive(false);
+      setNearMeDistance(30);
+      setSortByProximity(false);
       setIsOfflineMode(false);
+      setIsLargeText(false);
+      setIsHighContrast(false);
     }}
     className="w-full py-2.5 bg-zinc-900 border border-zinc-800 hover:text-white transition rounded-xl text-zinc-400 text-[10px] font-black uppercase tracking-widest mt-2"
   >
