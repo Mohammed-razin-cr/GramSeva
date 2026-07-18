@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState, useEffect } from "react";
+import { lazy, Suspense, useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import {
   Phone,
@@ -51,7 +51,11 @@ import {
   Eye,
   Type,
   Siren,
-  Filter
+  Filter,
+  ChevronRight,
+  CheckCircle2,
+  Keyboard,
+  Sparkles
 } from "lucide-react";
 import { LanguageProvider, useLanguage } from "./context/LanguageContext";
 import uiBackdrop from "./assets/gramseva-bg.svg";
@@ -317,13 +321,14 @@ function DirectoryApp() {
   const [isNearMeActive, setIsNearMeActive] = useState(false);
   const [nearMeDistance, setNearMeDistance] = useState(30);
   const [sortByProximity, setSortByProximity] = useState(false);
-  const [visibleCount, setVisibleCount] = useState(50);
+  const [visibleCount, setVisibleCount] = useState(12);
   const [reportService, setReportService] = useState(null);
   const [reportText, setReportText] = useState("");
   const [isLargeText, setIsLargeText] = useState(false);
   const [isHighContrast, setIsHighContrast] = useState(false);
+  const searchInputRef = useRef(null);
   useEffect(() => {
-    setVisibleCount(50);
+    setVisibleCount(12);
   }, [searchQuery, selectedCategory, selectedDistrict, selectedLocality, isNearMeActive, sortByProximity]);
   const getSimulatedDistance = (service) => {
     if (service.id === "serv-m1") return 1.2;
@@ -459,6 +464,29 @@ function DirectoryApp() {
   const [mapPan, setMapPan] = useState({ x: 0, y: 0 });
   const [isMapDragging, setIsMapDragging] = useState(false);
   const [mapDragStart, setMapDragStart] = useState({ x: 0, y: 0 });
+  useEffect(() => {
+    const handleKeyboardShortcuts = (event) => {
+      const target = event.target;
+      const isTyping = target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement;
+      if (event.key === "/" && !isTyping) {
+        event.preventDefault();
+        searchInputRef.current?.focus();
+      }
+      if (event.key === "Escape") {
+        if (reportService) {
+          setReportService(null);
+        } else if (selectedDetailService) {
+          setSelectedDetailService(null);
+          setDetailPreviewLang(null);
+        } else if (searchQuery) {
+          setSearchQuery("");
+          searchInputRef.current?.focus();
+        }
+      }
+    };
+    window.addEventListener("keydown", handleKeyboardShortcuts);
+    return () => window.removeEventListener("keydown", handleKeyboardShortcuts);
+  }, [reportService, searchQuery, selectedDetailService]);
   useEffect(() => {
     if (selectedDetailService) {
       setMapZoom(1);
@@ -964,7 +992,7 @@ Phone: ${service.phoneNumber}`;
     { id: "water connection", label: "Water connection", helper: t.water || "Water" },
     { id: "family health centre", label: "Family Health Centre", helper: t.health || "Health" }
   ];
-  return <div id="dir-app-root" style={{ "--gram-bg": `url(${uiBackdrop})` }} className={`gram-root observatory-shell min-h-screen ${isHighContrast ? "bg-black high-contrast" : ""} text-slate-900 font-sans antialiased flex flex-col 2xl:flex-row items-stretch 2xl:items-center justify-center p-0 sm:p-6 transition-all duration-300 ${isLargeText ? "text-[110%]" : ""}`}>
+  return <div id="dir-app-root" style={{ "--gram-bg": `url(${uiBackdrop})` }} className={`gram-root min-h-screen ${isHighContrast ? "bg-black high-contrast" : ""} text-slate-900 font-sans antialiased flex items-stretch justify-center transition-all duration-300 ${isLargeText ? "text-[110%]" : ""}`}>
       <a href="#service-results" className="skip-link">Skip to service results</a>
       <nav className="observatory-nav" aria-label="Primary navigation">
         <div className="brand-mark">
@@ -1051,12 +1079,12 @@ Phone: ${service.phoneNumber}`;
       {
     /* App frame */
   }
-      <div className="directory-frame relative w-full max-w-none lg:max-w-[1180px] 2xl:max-w-[1080px] h-dvh min-h-[620px] sm:h-[calc(100vh-48px)] sm:min-h-[720px] sm:rounded-[36px] sm:border sm:border-stone-300/80 sm:shadow-xl flex flex-col overflow-hidden transition-all animate-soft-rise">
+      <div className="directory-frame relative w-full max-w-[1600px] h-dvh min-h-[620px] bg-[#101214] lg:h-[calc(100vh-32px)] lg:my-4 lg:rounded-2xl lg:border lg:border-slate-300/70 lg:shadow-2xl flex flex-col overflow-hidden transition-all">
         
         {
     /* Dynamic Mobile Banner Header block */
   }
-        <div className="gram-header text-white p-4 sm:p-5 lg:p-6 pt-8 sm:pt-6 pb-5 shrink-0 flex flex-col gap-2 relative shadow-lg animate-sheen">
+        <header className="gram-header app-header text-white p-4 sm:p-5 lg:p-6 pt-6 pb-5 shrink-0 flex flex-col gap-2 relative">
           
           {
     /* Virtual OS Status Bar */
@@ -1064,7 +1092,7 @@ Phone: ${service.phoneNumber}`;
           <div className="h-6 flex justify-between items-center text-[12px] text-white/95 font-semibold px-1 mb-1">
             <span>9:41</span>
             <span className="font-label text-[10px] font-extrabold tracking-widest text-emerald-100 uppercase">GramSeva</span>
-            <div className={`flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-[9px] font-bold border backdrop-blur-sm transition-colors ${isOfflineMode ? "bg-amber-500/20 text-amber-300 border-amber-500/30" : "bg-emerald-500/20 text-emerald-200 border-emerald-300/30"}`}>
+            <div className={`network-status flex items-center space-x-1 px-2.5 py-0.5 text-[9px] font-bold border transition-colors ${isOfflineMode ? "is-offline bg-amber-500/20 text-amber-300 border-amber-500/30" : "bg-emerald-500/20 text-emerald-200 border-emerald-300/30"}`}>
               <span className={`w-1.5 h-1.5 rounded-full ${isOfflineMode ? "bg-amber-400" : "bg-emerald-400 animate-pulse"}`} />
               <span className="font-label">Offline Ready</span>
             </div>
@@ -1087,7 +1115,7 @@ Phone: ${service.phoneNumber}`;
             {
     /* Quick Vernacular Lang Buttons (Capsule style matching mockup) */
   }
-            <div className="flex bg-black/20 p-0.5 rounded-xl border border-white/15 shrink-0 shadow-inner backdrop-blur-sm">
+            <div className="language-switcher flex bg-black/20 p-0.5 border border-white/15 shrink-0">
               {[
     { code: "en", label: "EN" },
     { code: "ml", label: "\u0D2E\u0D32" },
@@ -1099,7 +1127,8 @@ Phone: ${service.phoneNumber}`;
     return <button
       key={lang.code}
       onClick={() => setLanguage(lang.code)}
-      className={`px-2 py-0.5 rounded-lg text-[10px] font-extrabold tracking-tight transition active:scale-95 ${isActive ? "bg-white text-emerald-900 shadow-xs" : "text-white/85 hover:bg-white/10"}`}
+      aria-pressed={isActive}
+      className={isActive ? "is-active" : ""}
     >
                     {lang.label}
                   </button>;
@@ -1132,9 +1161,10 @@ Phone: ${service.phoneNumber}`;
     /* Primary search input */
   }
           <div className="relative md:max-w-3xl">
-            <div className="service-search bg-white rounded-2xl p-1.5 shadow-md flex items-center mt-3 border border-slate-100">
+            <div className={`service-search bg-white flex items-center mt-3 border transition ${isSearchFocused ? "is-focused" : ""}`}>
               <Search className="w-4 h-4 text-slate-400 ml-3 shrink-0" />
               <input
+    ref={searchInputRef}
     type="text"
     aria-label="Search services by name, category, place, contact, or language"
     placeholder={t.searchPlaceholder || "Search services..."}
@@ -1144,11 +1174,9 @@ Phone: ${service.phoneNumber}`;
     onChange={(e) => setSearchQuery(e.target.value)}
     className="w-full text-slate-800 placeholder-slate-400 bg-transparent text-sm py-2 px-2.5 outline-none border-none leading-none font-semibold"
   />
-              {searchQuery ? <button onClick={() => setSearchQuery("")} className="p-1 text-slate-400 hover:text-slate-600 mr-2" aria-label="Clear search">
-                  <X className="w-3.5 h-3.5" />
-                </button> : <span className="w-4 h-4 rounded-full bg-slate-100 mr-3 shrink-0 flex items-center justify-center">
-                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
-                </span>}
+              {searchQuery ? <button onClick={() => setSearchQuery("")} className="search-clear" aria-label="Clear search">
+                  <X className="w-4 h-4" />
+                </button> : <span className="search-shortcut" aria-hidden="true"><Keyboard className="w-3.5 h-3.5" /> /</span>}
             </div>
             {isSearchFocused && searchSuggestions.length > 0 && <div className="absolute top-full mt-2 left-0 right-0 z-40 bg-white/95 backdrop-blur-xl text-slate-900 border border-slate-200 rounded-2xl shadow-xl p-2 animate-soft-rise">
                 <div className="px-2 pb-1 text-[10px] font-black uppercase tracking-wider text-slate-400">{ui.searchSuggestions}</div>
@@ -1163,12 +1191,12 @@ Phone: ${service.phoneNumber}`;
               </div>}
           </div>
 
-        </div>
+        </header>
 
         {
     /* View switcher container */
   }
-        <div className="flex-1 flex flex-col min-h-0 bg-[#121214]">
+        <div className="app-content-shell flex-1 flex flex-col min-h-0 bg-[#101214]">
           
           {
     /* Tab Content 1: Services Directory List */
@@ -1193,13 +1221,43 @@ Phone: ${service.phoneNumber}`;
   })}
               </div>
 
+              <div className="interaction-rail px-4 sm:px-5 lg:px-6 py-3 border-b border-zinc-800/70">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div className="flex flex-wrap items-center gap-2 text-[10px] font-bold">
+                    <span className="rail-chip rail-result-count"><Sparkles className="w-3.5 h-3.5" /> {filteredServices.length} matches</span>
+                    <span className="rail-chip">{selectedCategory === "all" ? "All services" : getCategoryName(selectedCategory)}</span>
+                    <span className="rail-chip">{selectedDistrict === "all" ? "All districts" : selectedDistrict}</span>
+                    <span className="rail-chip">{selectedLocality === "all" ? "All localities" : selectedLocality}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button type="button" onClick={() => setSortByProximity((value) => !value)} className={`rail-action ${sortByProximity ? "is-active" : ""}`} aria-pressed={sortByProximity}>Nearest first</button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSearchQuery("");
+                        setSelectedCategory("all");
+                        setSelectedDistrict("Kozhikode");
+                        setSelectedLocality("Mukkali");
+                        setSortByProximity(false);
+                      }}
+                      className="rail-action"
+                    >
+                      Reset
+                    </button>
+                  </div>
+                </div>
+              </div>
+
               {
     /* Dynamic scrollable directory area */
   }
-              <div id="service-results" className="service-observatory flex-1 overflow-y-auto px-4 sm:px-5 lg:px-8 pt-3 sm:pt-5 pb-24 scrollbar-none space-y-3 lg:grid lg:grid-cols-2 lg:gap-5 lg:space-y-0 lg:items-start" tabIndex={-1}>
-                <div className="service-feed-heading flex justify-between items-center text-xs font-black tracking-wider text-zinc-500 uppercase px-1 mb-1 lg:col-span-2">
-                  <span>Nearby Services</span>
-                  <span>{filteredServices.length} listed</span>
+              <div id="service-results" className="service-observatory flex-1 overflow-y-auto px-4 sm:px-5 lg:px-6 pt-4 pb-24 scrollbar-none" tabIndex={-1}>
+                <div className="service-feed-heading flex justify-between items-end gap-4 px-1 mb-1">
+                  <div>
+                    <span className="service-feed-kicker">Directory results</span>
+                    <h3>Services near {selectedLocality === "all" ? selectedDistrict : selectedLocality}</h3>
+                  </div>
+                  <span className="service-feed-count">Showing {Math.min(visibleCount, filteredServices.length)} of {filteredServices.length}</span>
                 </div>
 
                 <AnimatePresence initial={false}>
@@ -1235,7 +1293,7 @@ Phone: ${service.phoneNumber}`;
       role="button"
       tabIndex={0}
       aria-label={`Open details for ${data.title}`}
-      className="service-card bg-zinc-900/95 border border-zinc-800/80 rounded-2xl p-4 sm:p-5 cursor-pointer hover:bg-zinc-800/80 hover:border-zinc-700 transition-all duration-200 flex flex-col sm:flex-row gap-3 sm:gap-4 shadow-md relative"
+      className="service-card bg-zinc-900/95 border border-zinc-800/80 p-4 sm:p-5 cursor-pointer transition flex flex-row gap-3 sm:gap-4 relative"
     >
                           {
       /* Emergency Stripe */
@@ -1245,7 +1303,7 @@ Phone: ${service.phoneNumber}`;
                           {
       /* Customized icon wrapper on left */
     }
-                          <div className={`icon-tile w-12 h-12 lg:w-13 lg:h-13 rounded-2xl flex items-center justify-center shrink-0 ${getCategoryColor(service.categoryKey)}`}>
+                          <div className={`icon-tile w-12 h-12 lg:w-13 lg:h-13 flex items-center justify-center shrink-0 ${getCategoryColor(service.categoryKey)}`}>
                             {getCustomizedIcon(service)}
                           </div>
 
@@ -1254,16 +1312,16 @@ Phone: ${service.phoneNumber}`;
     }
                           <div className="flex-1 min-w-0">
                             <div className="service-card-head flex flex-col min-[520px]:flex-row min-[520px]:items-start min-[520px]:justify-between gap-2">
-                              <h3 className="service-card-title font-classical text-base font-black text-white leading-snug tracking-tight pr-1">
+                              <h3 className="service-card-title text-[15px] sm:text-base font-extrabold text-white leading-snug pr-1">
                                 {data.title}
                               </h3>
                               
                               {
       /* Status indicator capsule */
     }
-                              {isVerifiedPulse ? <span className="service-status shrink-0 text-[9px] font-black tracking-tight text-emerald-400 bg-emerald-950/40 border border-emerald-500/20 px-2 py-0.5 rounded-full flex items-center gap-1">
-                                  <span className="w-1 h-1 rounded-full bg-emerald-400 animate-ping" />
-                                  <span className="font-label">Verified</span>
+                              {isVerifiedPulse ? <span className="service-status shrink-0 text-[10px] font-bold text-emerald-300 bg-emerald-950/40 border border-emerald-500/25 px-2 py-1 flex items-center gap-1">
+                                  <CheckCircle2 className="w-3 h-3" />
+                                  <span>Verified</span>
                                 </span> : <span className="service-status shrink-0 text-[9px] font-black tracking-tight text-amber-400 bg-amber-950/40 border border-amber-500/20 px-2 py-0.5 rounded-full">
                                   May be outdated
                                 </span>}
@@ -1297,8 +1355,8 @@ Phone: ${service.phoneNumber}`;
                               {duplicateCount > 1 && <span className="duplicate-risk">Duplicate risk</span>}
                             </div>
                             <div className="service-card-footer mt-3">
-                              <span>Open details</span>
-                              <span aria-hidden="true">+</span>
+                              <span>View service details</span>
+                              <span aria-hidden="true"><ChevronRight className="w-3.5 h-3.5" /></span>
                             </div>
                           </div>
 
@@ -1322,10 +1380,10 @@ Phone: ${service.phoneNumber}`;
 
                 {filteredServices.length > visibleCount && <div className="pt-2 pb-4 text-center lg:col-span-2">
                     <button
-    onClick={() => setVisibleCount((p) => p + 100)}
+    onClick={() => setVisibleCount((p) => p + 12)}
     className="w-full py-3 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800/80 text-emerald-400 font-extrabold text-xs uppercase tracking-widest rounded-2xl transition shadow-md active:scale-98"
   >
-                      Load More (+100)
+                      Show 12 more services
                     </button>
                     <p className="text-[10px] text-zinc-500 font-semibold mt-1.5">
                       Showing {visibleCount} of {filteredServices.length} services
@@ -1777,6 +1835,9 @@ Phone: ${service.phoneNumber}`;
       animate={{ y: 0 }}
       exit={{ y: "100%" }}
       transition={{ type: "spring", damping: 30, stiffness: 400 }}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="service-detail-title"
       className="absolute inset-x-0 bottom-0 max-h-[85%] md:inset-x-auto md:right-0 md:top-0 md:bottom-0 md:h-full md:w-[min(460px,42vw)] md:max-h-none bg-zinc-950 border-t md:border-t-0 md:border-l border-zinc-800 rounded-t-[32px] md:rounded-none shadow-[0_-12px_42px_rgba(0,0,0,0.85)] md:shadow-[-18px_0_42px_rgba(0,0,0,0.45)] z-50 flex flex-col overflow-hidden text-zinc-100 font-sans"
     >
                   
@@ -1797,12 +1858,14 @@ Phone: ${service.phoneNumber}`;
                         <span className="text-[9px] font-black text-emerald-400 uppercase tracking-widest block leading-none mb-1">
                           {getCategoryName(selectedDetailService.categoryKey)}
                         </span>
-                        <h4 className="font-classical text-sm sm:text-base font-black truncate text-white leading-tight">
+                        <h4 id="service-detail-title" className="font-classical text-sm sm:text-base font-black text-white leading-tight">
                           {detailData.title}
                         </h4>
                       </div>
                     </div>
                     <button
+      type="button"
+      aria-label="Close service details"
       onClick={() => {
         setSelectedDetailService(null);
         setDetailPreviewLang(null);
@@ -1981,14 +2044,17 @@ Phone: ${service.phoneNumber}`;
     initial={{ opacity: 0, scale: 0.96, y: 12 }}
     animate={{ opacity: 1, scale: 1, y: 0 }}
     exit={{ opacity: 0, scale: 0.96, y: 12 }}
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="report-dialog-title"
     className="absolute z-[61] left-4 right-4 top-24 md:left-1/2 md:right-auto md:w-[420px] md:-translate-x-1/2 bg-zinc-950 border border-zinc-800 rounded-2xl shadow-2xl p-4 text-zinc-100"
   >
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <h3 className="font-classical text-lg font-black text-white">{ui.reportTitle}</h3>
+                    <h3 id="report-dialog-title" className="font-classical text-lg font-black text-white">{ui.reportTitle}</h3>
                     <p className="text-xs text-zinc-400 mt-1">{ui.reportHint}</p>
                   </div>
-                  <button onClick={() => setReportService(null)} className="p-1.5 bg-zinc-900 border border-zinc-800 rounded-lg text-zinc-400 hover:text-white">
+                  <button type="button" aria-label="Close report dialog" onClick={() => setReportService(null)} className="p-1.5 bg-zinc-900 border border-zinc-800 rounded-lg text-zinc-400 hover:text-white">
                     <X className="w-3.5 h-3.5" />
                   </button>
                 </div>
@@ -2022,7 +2088,7 @@ Phone: ${service.phoneNumber}`;
         {
     /* Static virtual bottom nav tab row (matching screenshots) */
   }
-        <div className="bottom-dock absolute bottom-0 inset-x-0 h-16 border-t border-zinc-800/85 flex items-center justify-around z-40 px-3 md:px-10 select-none" role="tablist" aria-label="Main app tabs">
+        <div className="bottom-dock app-dock absolute bottom-0 inset-x-0 border-t border-zinc-800/85 flex items-center justify-around z-40 px-2 select-none" role="tablist" aria-label="Main app tabs">
           {[
     { id: "services", label: ui.services, icon: <Building2 className="w-5 h-5" /> },
     { id: "emergency", label: ui.emergency, icon: <Siren className="w-5 h-5" /> },
@@ -2033,9 +2099,11 @@ Phone: ${service.phoneNumber}`;
     const isActive = currentTab === tab.id;
     return <button
       key={tab.id}
+      type="button"
       onClick={() => setCurrentTab(tab.id)}
       role="tab"
       aria-selected={isActive}
+      aria-current={isActive ? "page" : undefined}
       aria-label={`Open ${tab.label}`}
       className={`dock-button ${isActive ? "is-active" : ""} flex flex-col items-center justify-center gap-1 flex-1 py-1 transition cursor-pointer select-none active:scale-95 ${isActive ? "text-emerald-400 font-bold" : "text-zinc-500 hover:text-zinc-300"}`}
     >
